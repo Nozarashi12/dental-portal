@@ -167,10 +167,10 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section with Improved Color Balance */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-emerald-50/30">
+      <section className="relative overflow-hidden bg-linear-to-br from-gray-50 via-white to-emerald-50/30">
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(16,185,129,0.1)_1px,transparent_0)] bg-[size:40px_40px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(16,185,129,0.1)_1px,transparent_0)] bg-size-[40px_40px]" />
         </div>
         
         {/* Decorative Elements */}
@@ -191,7 +191,7 @@ export default function LandingPage() {
               {/* Main Heading with Better Hierarchy */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
                 <span className="block">Continuing Dental</span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-800 mt-2">
+                <span className="block text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-emerald-800 mt-2">
                   Education Portal
                 </span>
               </h1>
@@ -273,7 +273,7 @@ export default function LandingPage() {
                                 }}
                                 className="flex items-center p-4 hover:bg-emerald-50/50 border-b border-gray-100 group transition-colors"
                               >
-                                <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+                                <div className="shrink-0 w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
                                   <BookOpen className="w-5 h-5 text-emerald-600" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -291,7 +291,7 @@ export default function LandingPage() {
                                   </h4>
                                   <p className="text-sm text-gray-600 truncate">{course.instructor}</p>
                                 </div>
-                                <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-emerald-500 ml-4 flex-shrink-0 transition-colors" />
+                                <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-emerald-500 ml-4 shrink-0 transition-colors" />
                               </Link>
                             ))}
                           </div>
@@ -554,7 +554,7 @@ export default function LandingPage() {
       </div>
 
       {/* Main Courses Section */}
-      <section id="courses-section" className="py-12 bg-gradient-to-b from-white via-gray-50/30 to-white">
+      <section id="courses-section" className="py-12 bg-linear-to-b from-white via-gray-50/30 to-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-7xl mx-auto">
             {/* Section Header */}
@@ -628,7 +628,7 @@ export default function LandingPage() {
       </section>
 
       {/* Value Proposition Section */}
-      <section className="py-5 bg-gradient-to-b from-white via-white to-gray-50">
+      <section className="py-5 bg-linear-to-b from-white via-white to-gray-50">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
@@ -670,7 +670,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800">
+      <section className="py-20 bg-linear-to-br from-gray-900 to-gray-800">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
@@ -757,7 +757,7 @@ function CourseCard({ course }: CourseCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linea-to-t from-black/60 via-transparent to-transparent" />
           
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
