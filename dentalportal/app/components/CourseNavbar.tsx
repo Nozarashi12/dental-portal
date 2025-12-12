@@ -67,7 +67,7 @@ export default function CourseNavbar({ courseId }: CourseNavbarProps) {
                     href={href}
                     className={`group relative flex flex-col items-center py-3 px-6 transition-all duration-200 ${
                       active
-                        ? 'text-emerald-700 bg-gradient-to-b from-emerald-50/50 to-transparent'
+                        ? 'text-emerald-700 bg-linear-to-b from-emerald-50/50 to-transparent'
                         : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-50/50'
                     }`}
                   >
@@ -85,7 +85,7 @@ export default function CourseNavbar({ courseId }: CourseNavbarProps) {
                         <span className="font-medium text-sm whitespace-nowrap">{item.label}</span>
                       </div>
                     </div>
-                    {active && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-600" />}
+                    {active && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-emerald-500 to-emerald-600" />}
                   </Link>
                 );
               })}
