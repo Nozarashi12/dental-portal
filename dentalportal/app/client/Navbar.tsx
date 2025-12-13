@@ -7,27 +7,27 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, LogOut, User, BookOpen, HelpCircle } from 'lucide-react'
 
 export default function Navbar() {
-  const pathname = usePathname() || "/" // fallback for SSR
+  const pathname = usePathname() || "/"
   const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const [mounted, setMounted] = useState(false) // client mount check
+  const [mounted, setMounted] = useState(false)
 
-  // Ensure code runs only on client
+  // Client mount check
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Check login status on client
+  // FIXED LOGIN CHECK → Using JWT Token
   useEffect(() => {
     if (!mounted) return
-    const loggedIn = localStorage.getItem('loggedIn') === 'true'
-    setIsLoggedIn(loggedIn)
+    const token = localStorage.getItem("token")  // use token from login API
+    setIsLoggedIn(!!token)
   }, [mounted])
 
-  // Handle scroll effect
+  // Scroll effect
   useEffect(() => {
     if (!mounted) return
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
@@ -41,9 +41,10 @@ export default function Navbar() {
     setIsMobileMenuOpen(false)
   }, [pathname, mounted])
 
-  // Handle click outside for mobile menu
+  // Click outside to close
   useEffect(() => {
     if (!mounted) return
+
     const handleClickOutside = (event: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setIsMobileMenuOpen(false)
@@ -61,23 +62,24 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen, mounted])
 
-  // Handle logout
+  // FIXED LOGOUT
   const handleLogout = () => {
-    localStorage.removeItem('loggedIn')
+    localStorage.removeItem("token")
+    localStorage.removeItem("role")
     setIsLoggedIn(false)
-    router.push('/')
+    router.push("/")
     setIsMobileMenuOpen(false)
   }
 
-  // Navigation items
+  // Nav items
   const loggedOutNavItems = [
     { label: 'Course Catalog', href: '/', icon: <BookOpen className="w-4 h-4" /> },
-    { label: 'FAQ', href: '/faq', icon: <HelpCircle className="w-4 h-4" /> },
+    { label: 'FAQ', href: '/client/faq', icon: <HelpCircle className="w-4 h-4" /> },
   ]
 
   const loggedInNavItems = [
     { label: 'Course Catalog', href: '/', icon: <BookOpen className="w-4 h-4" /> },
-    { label: 'FAQ', href: '/faq', icon: <HelpCircle className="w-4 h-4" /> },
+    { label: 'FAQ', href: '/client/faq', icon: <HelpCircle className="w-4 h-4" /> },
     { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
   ]
 
@@ -95,9 +97,9 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between">
+
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
-              {/* Logo */}
               <div className="relative w-16 h-16 md:w-32 md:h-20">
                 <Image
                   src="/images/yenepoya_logo.png"
@@ -108,18 +110,14 @@ export default function Navbar() {
                   sizes="(max-width: 768px) 64px, 80px"
                 />
               </div>
-
-              {/* Vertical Line */}
               <div className="hidden md:block w-px h-8 bg-gray-300"></div>
-
-              {/* Text */}
               <div className="hidden md:block">
                 <h1 className="text-base font-semibold text-gray-900 leading-tight">Yenepoya Dental</h1>
                 <p className="text-xs text-emerald-700 font-medium">Continuing Education</p>
               </div>
             </Link>
 
-            {/* Desktop Nav Items */}
+            {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => (
                 <Link
@@ -131,9 +129,7 @@ export default function Navbar() {
                     ${pathname === item.href ? 'text-emerald-700 bg-emerald-50' : 'text-gray-700 hover:text-emerald-700'}
                   `}
                 >
-                  <span className={pathname === item.href ? 'text-emerald-600' : 'text-gray-400'}>
-                    {item.icon}
-                  </span>
+                  <span className={pathname === item.href ? 'text-emerald-600' : 'text-gray-400'}>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               ))}
@@ -151,13 +147,13 @@ export default function Navbar() {
                 ) : (
                   <div className="flex items-center space-x-3">
                     <Link
-                      href="/login"
+                      href="/client/login"
                       className="px-5 py-2.5 text-gray-700 font-medium hover:text-emerald-700 transition-colors text-sm"
                     >
                       Login
                     </Link>
                     <Link
-                      href="/signup"
+                      href="/client/signup"
                       className="px-5 py-2.5 bg-emerald-700 text-white font-semibold rounded-lg hover:bg-emerald-800 transition-colors shadow-sm hover:shadow text-sm"
                     >
                       Sign Up
@@ -167,11 +163,10 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
             </button>
@@ -179,7 +174,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Spacer for fixed nav */}
+      {/* Spacer */}
       <div className="h-16 md:h-20"></div>
 
       {/* Mobile Menu */}
@@ -193,7 +188,8 @@ export default function Navbar() {
         `}
       >
         <div className="h-full flex flex-col">
-          {/* Mobile Header */}
+
+          {/* Mobile header */}
           <div className="p-6 border-b border-gray-100 flex items-center space-x-3">
             <div className="relative w-14 h-14">
               <Image src="/images/yenepoya_logo.png" alt="Logo" fill className="object-contain" />
@@ -205,7 +201,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile nav items */}
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
             {navItems.map((item) => (
               <Link
@@ -224,7 +220,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Mobile Auth */}
+          {/* Mobile auth */}
           <div className="p-4 border-t border-gray-100">
             {isLoggedIn ? (
               <button
@@ -237,14 +233,14 @@ export default function Navbar() {
             ) : (
               <div className="space-y-3">
                 <Link
-                  href="/login"
+                  href="/client/login"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-center p-3 border border-emerald-600 text-emerald-700 font-medium rounded-lg hover:bg-emerald-50 transition-colors"
                 >
                   Login
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/client/signup"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center justify-center p-3 bg-emerald-700 text-white font-medium rounded-lg hover:bg-emerald-800 transition-colors"
                 >

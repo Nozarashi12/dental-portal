@@ -681,7 +681,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/signup"
+                href="/client/signup"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 group"
               >
                 <Calendar className="w-5 h-5 mr-3" />
@@ -746,7 +746,7 @@ interface CourseCardProps {
 
 function CourseCard({ course }: CourseCardProps) {
   return (
-    <Link href={`/course/${course.id}`} className="group block">
+    <Link href={`/client/course/${course.id}`} className="group block">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
         {/* Course Image with Overlay */}
         <div className="relative h-48 w-full overflow-hidden">
