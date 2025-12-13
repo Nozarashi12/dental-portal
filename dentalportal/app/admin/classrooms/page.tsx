@@ -1,58 +1,57 @@
 import Link from 'next/link'
-import pool from '@/lib/db'
+
+async function getClassrooms() {
+  const res = await fetch('http://localhost:3000/api/admin/classrooms', {
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error('Failed to fetch classrooms')
+  return res.json()
+}
 
 export default async function ClassroomsPage() {
-  const [rows] = await pool.query(
-    `SELECT cl.id, cl.title, cl.speaker, c.title AS course_title 
-     FROM classrooms cl 
-     JOIN courses c ON cl.course_id = c.id 
-     ORDER BY cl.created_at DESC`
-  )
+  const classrooms = await getClassrooms()
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Classrooms</h1>
         <Link
           href="/admin/classrooms/create"
-          className="px-3 py-2 bg-emerald-600 text-white rounded"
+          className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
         >
-          New Classroom
+          Add Classroom
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {rows.map((cl: any) => (
-          <div key={cl.id} className="bg-white p-4 rounded shadow">
-            <h3 className="font-semibold">{cl.title}</h3>
-            <p className="text-sm text-gray-500">
-              {cl.speaker} • {cl.course_title}
-            </p>
-
-            <div className="mt-3 flex space-x-2">
-              <Link
-                href={`/admin/classrooms/${cl.id}/edit`}
-                className="px-3 py-2 bg-blue-600 text-white rounded"
-              >
-                Edit
-              </Link>
-
-              <button
-                className="px-3 py-2 bg-red-600 text-white rounded"
-                onClick={async () => {
-                  if (!confirm('Delete?')) return
-                  await fetch(`/api/admin/classrooms/${cl.id}`, {
-                    method: 'DELETE',
-                  })
-                  location.reload()
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2 border">ID</th>
+            <th className="p-2 border">Title</th>
+            <th className="p-2 border">Speaker</th>
+            <th className="p-2 border">Course ID</th>
+            <th className="p-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {classrooms.map((c: any) => (
+            <tr key={c.id}>
+              <td className="p-2 border">{c.id}</td>
+              <td className="p-2 border">{c.title}</td>
+              <td className="p-2 border">{c.speaker}</td>
+              <td className="p-2 border">{c.course_id}</td>
+              <td className="p-2 border">
+                <Link
+                  href={`/admin/classrooms/${c.id}/edit`}
+                  className="text-blue-600 underline"
+                >
+                  Edit
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
