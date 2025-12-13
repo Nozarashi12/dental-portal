@@ -1,0 +1,44 @@
+import pool from '@/lib/db';
+
+export async function GET() {
+  try {
+    const [rows] = await pool.query(`
+      SELECT c.id, c.title, c.author, c.category, s.name AS specialty_name
+      FROM courses c
+      LEFT JOIN specialties s ON c.specialty_id = s.id
+      ORDER BY c.id DESC
+    `);
+
+    return new Response(JSON.stringify(rows), { status: 200 });
+  } catch (err: any) {
+    console.error(err);
+    return new Response(JSON.stringify({ message: err.message }), { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { title, author, author_description, cover_image, overview, description, category, specialty_id } = body;
+
+    await pool.query(
+    `INSERT INTO courses
+     (title, author, author_description, cover_image, overview, description, category, specialty_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      body.title,
+      body.author,
+      body.author_description,
+      body.cover_image,
+      body.overview,
+      body.description,
+      body.category,
+      body.specialty_id ? Number(body.specialty_id) : null, // ✅ FIX
+    ]
+  )
+    return new Response(JSON.stringify({ success: true }), { status: 201 });
+  } catch (err: any) {
+    console.error(err);
+    return new Response(JSON.stringify({ success: false, message: err.message }), { status: 500 });
+  }
+}

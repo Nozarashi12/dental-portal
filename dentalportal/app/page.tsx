@@ -1,7 +1,7 @@
 // app/page.tsx
-import Navbar from "./components/Navbar";
-import LandingPage from "./components/LandingPage";
-import Footer from "./components/Footer";
+import Navbar from "./Client/Navbar";
+import LandingPage from "./Client/LandingPage";
+import Footer from "./Client/Footer";
 
 export default function Home() {
   return (

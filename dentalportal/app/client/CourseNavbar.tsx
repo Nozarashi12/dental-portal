@@ -37,8 +37,8 @@ export default function CourseNavbar({ courseId }: CourseNavbarProps) {
 
   const isActive = useCallback(
     (path: string) => {
-      if (path === '') return pathname === `/course/${courseId}` || pathname === `/course/${courseId}/`;
-      return pathname?.includes(`/course/${courseId}/${path}`);
+      if (path === '') return pathname === `/client/course/${courseId}` || pathname === `/client/course/${courseId}/`;
+      return pathname?.includes(`/client/course/${courseId}/${path}`);
     },
     [pathname, courseId]
   );
@@ -59,7 +59,7 @@ export default function CourseNavbar({ courseId }: CourseNavbarProps) {
             {/* Desktop Navbar */}
             <div className="hidden lg:flex items-center space-x-1 flex-1">
               {navItems.map((item) => {
-                const href = item.path === '' ? `/course/${courseId}` : `/course/${courseId}/${item.path}`;
+                const href = item.path === '' ? `/client/course/${courseId}` : `/client/course/${courseId}/${item.path}`;
                 const active = isActive(item.path);
                 return (
                   <Link
@@ -94,7 +94,7 @@ export default function CourseNavbar({ courseId }: CourseNavbarProps) {
             {/* Mobile Navbar - Icons only */}
             <div className="flex lg:hidden justify-between w-full">
               {navItems.map((item) => {
-                const href = item.path === '' ? `/course/${courseId}` : `/course/${courseId}/${item.path}`;
+                const href = item.path === '' ? `/client/course/${courseId}` : `/client/course/${courseId}/${item.path}`;
                 const active = isActive(item.path);
                 return (
                   <Link

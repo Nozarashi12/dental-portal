@@ -1,8 +1,8 @@
 // Server Component
 
-import Navbar from "../../components/Navbar";
-import CourseNavbar from "../../components/CourseNavbar";
-import Footer from "../../components/Footer";
+import Navbar from "../../Navbar";
+import CourseNavbar from "../../CourseNavbar";
+import Footer from "../../Footer";
 
 interface CourseLayoutProps {
   children: React.ReactNode;
