@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import Navbar from '../Navbar.tsx';
+import Footer from '../Footer.tsx';
 import { 
   HelpCircle,
   BookOpen,
