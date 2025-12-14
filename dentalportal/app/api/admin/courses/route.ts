@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 export async function GET() {
   try {
     const [rows] = await pool.query(`
-      SELECT c.id, c.title, c.author, c.category, s.name AS specialty_name
+      SELECT c.id,c.cover_image,c.overview,c.created_at, c.title, c.author, c.category, s.name AS specialty_name
       FROM courses c
       LEFT JOIN specialties s ON c.specialty_id = s.id
       ORDER BY c.id DESC

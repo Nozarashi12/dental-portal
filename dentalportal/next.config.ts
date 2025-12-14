@@ -9,8 +9,20 @@ const nextConfig = {
         pathname: "/**",
       },
       {
-         protocol: "https",
+        protocol: "https",
         hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "media.istockphoto.com",
         port: "",
         pathname: "/**",
       },
