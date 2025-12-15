@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Mail, Lock, AlertCircle, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import Cookies from 'js-cookie' // Add this import
 
 export default function LoginPage() {
   const router = useRouter()
@@ -34,19 +35,21 @@ export default function LoginPage() {
         return
       }
 
-      // Save token & role
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('role', data.role)
-      localStorage.setItem('userEmail', email)
+      // ✅ IMPORTANT: Also set token in localStorage for immediate Navbar update
+      if (data.token) {
+        Cookies.set('token', data.token, { expires: 7, path: '/' })
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('role', data.role)
+      }
 
       if (data.role === 'admin') {
         router.push('/admin')
-        return
+      } else {
+        router.push('/')
       }
 
-      router.push('/')
       router.refresh()
-    } catch (err) {
+    } catch {
       setError('Something went wrong')
     }
 
@@ -140,7 +143,7 @@ export default function LoginPage() {
           <div className="mt-8 text-center">
             <p>
               Don’t have an account?{' '}
-              <Link href="/Client/signup" className="text-emerald-700 font-semibold">
+              <Link href="/client/signup" className="text-emerald-700 font-semibold">
                 Create one
               </Link>
             </p>

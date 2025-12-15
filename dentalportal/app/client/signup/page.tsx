@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, User, Briefcase, AlertCircle } from 'lucide-react'
+import { AlertCircle, User, Mail, Lock, Briefcase } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import Cookies from 'js-cookie' // Add this import
 
 export default function SignupPage() {
   const router = useRouter()
@@ -15,22 +16,22 @@ export default function SignupPage() {
     password: '',
     specialty: ''
   })
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData(prev => ({
-      ...prev,
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value
-    }))
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
+    setError('')
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -40,7 +41,8 @@ export default function SignupPage() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: 'client'
+          role: 'client',
+          specialty: formData.specialty
         })
       })
 
@@ -52,19 +54,22 @@ export default function SignupPage() {
         return
       }
 
-      // Save token & role
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('role', data.role)
-      localStorage.setItem('userName', formData.name)
+      // ✅ IMPORTANT: Also set token in localStorage for immediate Navbar update
+      if (data.token) {
+        Cookies.set('token', data.token, { expires: 7, path: '/' })
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('role', data.role || 'client')
+      }
 
       router.push('/')
       router.refresh()
-    } catch (err) {
-      setError('Something went wrong.')
+    } catch {
+      setError('Something went wrong')
     }
 
     setLoading(false)
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
@@ -195,7 +200,7 @@ export default function SignupPage() {
           <div className="mt-8 text-center">
             <p>
               Already have an account?{' '}
-              <Link href="/Client/login" className="text-emerald-700 font-semibold">
+              <Link href="/client/login" className="text-emerald-700 font-semibold">
                 Sign in
               </Link>
             </p>
