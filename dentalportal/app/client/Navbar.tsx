@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, LogOut, User, BookOpen, HelpCircle } from 'lucide-react'
+import Cookies from 'js-cookie'
 
 export default function Navbar() {
   const pathname = usePathname() || "/"
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -20,11 +22,30 @@ export default function Navbar() {
     setMounted(true)
   }, [])
 
-  // FIXED LOGIN CHECK → Using JWT Token
+  /* -------------------- AUTH CHECK (COOKIES) -------------------- */
+  const checkAuthStatus = () => {
+    // Check for authentication cookie or localStorage token
+    const token = Cookies.get('token') || localStorage.getItem("token")
+    // Validate JWT token structure (basic check)
+    const isValidToken = token && token.split('.').length === 3
+    setIsLoggedIn(!!isValidToken)
+  }
+
+  // Check auth on mount and on pathname change (when user navigates)
   useEffect(() => {
     if (!mounted) return
-    const token = localStorage.getItem("token")  // use token from login API
-    setIsLoggedIn(!!token)
+    checkAuthStatus()
+  }, [mounted, pathname])
+
+  // Also check auth periodically (every 2 seconds) when component is mounted
+  useEffect(() => {
+    if (!mounted) return
+    
+    const interval = setInterval(() => {
+      checkAuthStatus()
+    }, 2000)
+    
+    return () => clearInterval(interval)
   }, [mounted])
 
   // Scroll effect
@@ -62,13 +83,40 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen, mounted])
 
-  // FIXED LOGOUT
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("role")
-    setIsLoggedIn(false)
-    router.push("/")
-    setIsMobileMenuOpen(false)
+  /* -------------------- LOGOUT -------------------- */
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    
+    try {
+      // Call the logout API to clear the server-side cookie
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } catch (error) {
+      console.error('Logout API error:', error)
+    } finally {
+      // Always clear client-side storage regardless of API response
+      Cookies.remove('token', { path: '/' })
+      Cookies.remove('role', { path: '/' })
+      
+      // Remove localStorage for backward compatibility
+      localStorage.removeItem("token")
+      localStorage.removeItem("role")
+      
+      // Update state immediately
+      setIsLoggedIn(false)
+      setIsLoggingOut(false)
+      
+      // Close mobile menu if open
+      setIsMobileMenuOpen(false)
+      
+      // Redirect to home
+      router.push("/")
+      
+      // Force a refresh to update all components
+      router.refresh()
+    }
   }
 
   // Nav items
@@ -84,6 +132,9 @@ export default function Navbar() {
   ]
 
   const navItems = isLoggedIn ? loggedInNavItems : loggedOutNavItems
+
+  // Don't render until mounted to avoid hydration issues
+  if (!mounted) return null
 
   return (
     <>
@@ -139,10 +190,15 @@ export default function Navbar() {
                 {isLoggedIn ? (
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    disabled={isLoggingOut}
+                    className={`flex items-center space-x-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                      isLoggingOut 
+                        ? 'text-gray-500 bg-gray-100 cursor-not-allowed' 
+                        : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                    }`}
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
+                    <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                   </button>
                 ) : (
                   <div className="flex items-center space-x-3">
@@ -225,10 +281,15 @@ export default function Navbar() {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center space-x-2 w-full p-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-red-50 hover:text-red-700 hover:border-red-200 transition-colors"
+                disabled={isLoggingOut}
+                className={`flex items-center justify-center space-x-2 w-full p-3 border text-gray-700 font-medium rounded-lg transition-colors ${
+                  isLoggingOut
+                    ? 'border-gray-300 bg-gray-100 cursor-not-allowed'
+                    : 'border-gray-300 hover:bg-red-50 hover:text-red-700 hover:border-red-200'
+                }`}
               >
                 <LogOut className="w-5 h-5" />
-                <span>Logout</span>
+                <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </button>
             ) : (
               <div className="space-y-3">
