@@ -26,6 +26,7 @@ interface Classroom {
   published_date: string;
   expiration_date?: string;
   discussion_enabled: boolean;
+  google_classroom_link?: string; 
   assessment_link?: string;
   created_at: string;
   updated_at: string;
@@ -33,6 +34,7 @@ interface Classroom {
   duration_minutes?: number;
   views?: number;
 }
+
 
 // Interface for course data
 interface Course {
@@ -579,7 +581,16 @@ export default function ClassroomPage() {
                               Take Assessment
                             </button>
                           )}
-                          
+                          {lecture.discussion_enabled && lecture.google_classroom_link && (
+  <button
+    onClick={() => window.open(lecture.google_classroom_link!, '_blank')}
+    className="flex items-center justify-center px-4 py-3 text-emerald-700 hover:text-emerald-900 font-medium text-sm border-2 border-emerald-300 rounded-lg hover:bg-emerald-50 transition-colors shadow-sm"
+  >
+    <Users className="w-4 h-4 mr-2" />
+    Join Classroom Discussion
+  </button>
+)}
+
                           <button 
                             onClick={() => setExpandedLecture(expandedLecture === lecture.id ? null : lecture.id)}
                             className="flex items-center justify-center px-4 py-3 text-emerald-600 hover:text-emerald-800 font-medium text-sm border-2 border-emerald-200 rounded-lg hover:bg-emerald-50 transition-colors"

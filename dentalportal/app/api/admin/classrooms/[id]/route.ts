@@ -15,7 +15,18 @@ export async function PUT(req: Request, { params }: { params: any }) {
 
   await pool.query(
     `UPDATE classrooms
-     SET title=?, speaker=?, description=?, author_description=?, course_id=?, video_url=?, learning_objectives=?, published_date=?, expiration_date=?, discussion_enabled=?, assessment_link=?
+     SET title=?,
+         speaker=?,
+         description=?,
+         author_description=?,
+         course_id=?,
+         video_url=?,
+         learning_objectives=?,
+         published_date=?,
+         expiration_date=?,
+         discussion_enabled=?,
+         google_classroom_link=?,
+         assessment_link=?
      WHERE id=?`,
     [
       body.title,
@@ -28,6 +39,7 @@ export async function PUT(req: Request, { params }: { params: any }) {
       formatDateTime(body.published_date),
       formatDateTime(body.expiration_date),
       body.discussion_enabled ? 1 : 0,
+      body.discussion_enabled ? body.google_classroom_link : null,
       body.assessment_link,
       id,
     ]

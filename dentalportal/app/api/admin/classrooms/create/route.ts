@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       expiration_date,
       discussion_enabled,
       assessment_link,
+      google_classroom_link, // ✅ ADDED
     } = body
 
     await pool.query(
@@ -30,8 +31,9 @@ export async function POST(req: Request) {
         published_date,
         expiration_date,
         discussion_enabled,
+        google_classroom_link,
         assessment_link
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         course_id,
         title,
@@ -43,6 +45,7 @@ export async function POST(req: Request) {
         published_date,
         expiration_date || null,
         discussion_enabled ?? 1,
+        discussion_enabled ? google_classroom_link : null,
         assessment_link || null,
       ]
     )
