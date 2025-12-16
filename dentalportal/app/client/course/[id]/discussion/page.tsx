@@ -1,558 +1,376 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from "../../../components/ui/Button"
-import { Card } from "../../../components/ui/Card"
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { 
+  ExternalLink, Loader2, AlertCircle, ArrowLeft, 
+  MessageSquare, Users, Calendar, Globe, BookOpen,
+  ChevronRight, Sparkles, ArrowUpRight
+} from 'lucide-react'
 
-export default function CourseDiscussionPage() {
-  const [search, setSearch] = useState('')
-  const [activeTab, setActiveTab] = useState<'discussions' | 'photos'>('discussions')
-  const [activeGroup, setActiveGroup] = useState<'forum' | 'closed'>('forum')
-  const [showForumModal, setShowForumModal] = useState(false)
-  const [showTopicModal, setShowTopicModal] = useState(false)
-  const [selectedForum, setSelectedForum] = useState<string | null>(null)
+interface Classroom {
+  id: number
+  title: string
+  discussion_enabled: boolean
+  google_classroom_link?: string
+  published_date: string
+  speaker: string
+}
 
-  const discussions = [
-    {
-      id: 1,
-      title: "SDF (Silver Diamine Fluoride)",
-      description: "Discussion about SDF applications in special needs dentistry",
-      date: "August 13, 2022",
-      topics: 12,
-      comments: 47,
-      lastActivity: "2 hours ago",
-      isPinned: true,
-      category: "Clinical Techniques"
-    },
-    {
-      id: 2,
-      title: "Preventive health considerations for individuals with special needs",
-      description: "Strategies and best practices for preventive care",
-      date: "April 28, 2022",
-      topics: 8,
-      comments: 32,
-      lastActivity: "1 day ago",
-      isPinned: true,
-      category: "Preventive Care"
-    },
-    {
-      id: 3,
-      title: "Questions about course materials",
-      description: "General questions and clarifications about lecture content",
-      date: "April 28, 2021",
-      topics: 45,
-      comments: 189,
-      lastActivity: "Just now",
-      isPinned: false,
-      category: "General"
-    },
-    {
-      id: 4,
-      title: "Behavior management techniques",
-      description: "Sharing experiences with patient behavior management",
-      date: "March 15, 2022",
-      topics: 6,
-      comments: 28,
-      lastActivity: "3 days ago",
-      isPinned: false,
-      category: "Patient Management"
-    },
-    {
-      id: 5,
-      title: "Equipment adaptations for wheelchair users",
-      description: "Discussing office modifications and adaptive equipment",
-      date: "February 10, 2022",
-      topics: 5,
-      comments: 31,
-      lastActivity: "1 week ago",
-      isPinned: true,
-      category: "Practice Management"
+interface Course {
+  id: number
+  title: string
+  author: string
+}
+
+export default function DiscussionPage() {
+  const params = useParams()
+  const router = useRouter()
+  const courseId = params.id as string
+
+  const [course, setCourse] = useState<Course | null>(null)
+  const [classrooms, setClassrooms] = useState<Classroom[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0
+  })
+
+  useEffect(() => {
+    if (!courseId) return
+    fetchData()
+  }, [courseId])
+
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Fetch course
+      const courseRes = await fetch(`/api/admin/courses/${courseId}`)
+      if (!courseRes.ok) throw new Error('Failed to fetch course')
+      const courseData = await courseRes.json()
+      setCourse(courseData)
+
+      // Fetch classrooms
+      const classroomRes = await fetch(
+        `/api/admin/classrooms/course/${courseId}`
+      )
+      if (!classroomRes.ok) throw new Error('Failed to fetch discussions')
+      const classroomData = await classroomRes.json()
+      
+      setClassrooms(classroomData)
+      
+      // Calculate stats
+      const discussionClassrooms = classroomData.filter(
+        (c: Classroom) => c.discussion_enabled && c.google_classroom_link
+      )
+      
+      const now = new Date()
+      const activeDiscussions = discussionClassrooms.filter(
+        (c: Classroom) => {
+          const published = new Date(c.published_date)
+          return published <= now
+        }
+      )
+      
+      setStats({
+        total: discussionClassrooms.length,
+        active: activeDiscussions.length
+      })
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
-  const learningObjectives = [
-    "Learn to become a competent and willing provider of care for patients with differing needs.",
-    "Learn to utilize best accommodations to optimize oral health through the lifetime focusing on preventing, reversing and arresting disease through evidence-based interventions in-office and at-home.",
-    "Develop skills in prevention, primary care and maintaining oral health without being dependent on sedation and general anesthesia for the disabled population.",
-    "Learn how team utilization can improve the quality of life for both the disabled individual and their families."
-  ]
+  const discussionClassrooms = classrooms.filter(
+    c => c.discussion_enabled && c.google_classroom_link
+  )
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                Persons with Disabilities Presentation Series
-              </h1>
-              <p className="text-gray-600 mt-1 text-sm">Community Discussion Forum</p>
+  const getDiscussionStatus = (publishedDate: string) => {
+    const now = new Date()
+    const published = new Date(publishedDate)
+    return published <= now ? 'active' : 'upcoming'
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
+
+  // -------------------- LOADING STATE --------------------
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 w-64 bg-gray-200 rounded-lg mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="h-32 bg-gray-100 rounded-2xl"></div>
+              <div className="h-32 bg-gray-100 rounded-2xl"></div>
+              <div className="h-32 bg-gray-100 rounded-2xl"></div>
+            </div>
+            <div className="space-y-4 mt-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-24 bg-gray-100 rounded-2xl"></div>
+              ))}
             </div>
           </div>
         </div>
-      </header>
+      </div>
+    )
+  }
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Left Column - Discussions */}
-          <div className="lg:col-span-8 space-y-8">
-            {/* Tabs Navigation */}
-            <div className="flex items-center justify-between border-b border-gray-200">
-              <div className="flex">
+  // -------------------- ERROR STATE --------------------
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
+        <div className="max-w-md text-center">
+          <div className="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="h-10 w-10 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="px-5 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={fetchData}
+              className="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2"
+            >
+              <Loader2 className="w-4 h-4" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-3">
                 <button
-                  onClick={() => setActiveTab('discussions')}
-                  className={`px-6 py-3 font-medium text-lg border-b-2 transition-colors duration-200 ${activeTab === 'discussions' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => router.back()}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
                 >
-                  💬 Discussions
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
-                <button
-                  onClick={() => setActiveTab('photos')}
-                  className={`px-6 py-3 font-medium text-lg border-b-2 transition-colors duration-200 ${activeTab === 'photos' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                >
-                  📸 Photos
-                </button>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="relative hidden sm:block">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    🔍
-                  </span>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search discussions..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent w-48 sm:w-64"
-                  />
-                  {search && (
-                    <button
-                      onClick={() => setSearch('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      ✕
-                    </button>
-                  )}
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  Discussions
                 </div>
-                <button
-                  onClick={() => setShowForumModal(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-medium hover:shadow-md transition-all duration-200"
-                >
-                  + New Forum
-                </button>
-              </div>
-            </div>
-
-            {/* Group Selection */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex bg-gray-100 p-1 rounded-lg">
-                <button
-                  onClick={() => setActiveGroup('forum')}
-                  className={`px-6 py-2 rounded-md transition-all duration-200 ${activeGroup === 'forum' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  Public Forum
-                </button>
-                <button
-                  onClick={() => setActiveGroup('closed')}
-                  className={`px-6 py-2 rounded-md transition-all duration-200 ${activeGroup === 'closed' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-600 hover:text-gray-900'}`}
-                >
-                  Study Groups
-                </button>
               </div>
               
-              <div className="flex items-center text-sm text-gray-600">
-                <span className="mr-2">📊</span>
-                {discussions.length} active discussions • 124 participants
-              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                {course?.title}
+              </h1>
+              <p className="text-gray-600 mt-2 flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Course by {course?.author} • {discussionClassrooms.length} discussion{classrooms.length !== 1 ? 's' : ''}
+              </p>
             </div>
 
-            {/* Discussions List - Improved card spacing */}
-            <div className="space-y-6">
-              {discussions.map((discussion) => (
-                <div
-                  key={discussion.id}
-                  onClick={() => setSelectedForum(discussion.id.toString() === selectedForum ? null : discussion.id.toString())}
-                  className="cursor-pointer"
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-gray-700">
+                {stats.active} active discussion{stats.active !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Total Discussions</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Active Now</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <Globe className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Platform</p>
+                <p className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  Google Classroom
+                  <Sparkles className="w-4 h-4 text-purple-500" />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Discussions List */}
+        <div>
+          {discussionClassrooms.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <MessageSquare className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No discussions yet
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Discussions will appear here once they're enabled for classrooms in this course.
+                </p>
+                <button
+                  onClick={() => router.push(`/admin/courses/${courseId}`)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-colors"
                 >
-                  <Card 
-                    className="p-6 hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-4">
-                          <div className="flex flex-wrap items-center gap-2">
-                            {discussion.isPinned && (
-                              <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full flex items-center">
-                                📌 Pinned
-                              </span>
-                            )}
-                            <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
-                              {discussion.category}
+                  Go to Course
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">
+                  All Discussions ({discussionClassrooms.length})
+                </h2>
+                <div className="text-sm text-gray-500">
+                  Sorted by date
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {discussionClassrooms.map((classroom) => {
+                  const status = getDiscussionStatus(classroom.published_date)
+                  
+                  return (
+                    <div
+                      key={classroom.id}
+                      className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-emerald-200 hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                              status === 'active' 
+                                ? 'bg-emerald-50 text-emerald-700' 
+                                : 'bg-amber-50 text-amber-700'
+                            }`}>
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                status === 'active' ? 'bg-emerald-500' : 'bg-amber-500'
+                              }`}></div>
+                              {status === 'active' ? 'Active' : 'Upcoming'}
                             </span>
-                            <span className="text-sm text-gray-500">
-                              Started {discussion.date}
-                            </span>
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-emerald-600 transition-colors">
-                              {discussion.title}
-                            </h3>
-                            <p className="text-gray-600">
-                              {discussion.description}
-                            </p>
-                          </div>
-                          
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center">
-                              <span className="mr-1">💭</span>
-                              {discussion.topics} topics
-                            </span>
-                            <span className="flex items-center">
-                              <span className="mr-1">💬</span>
-                              {discussion.comments} comments
-                            </span>
-                            <span className="flex items-center">
-                              <span className="mr-1">🕒</span>
-                              Last activity {discussion.lastActivity}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setShowTopicModal(true)
-                          }}
-                          className="ml-4 px-4 py-2 bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-600 rounded-lg font-medium hover:from-emerald-100 hover:to-emerald-200 transition-all duration-200"
-                        >
-                          + New Topic
-                        </button>
-                      </div>
-                      
-                      {/* Expanded Content */}
-                      {selectedForum === discussion.id.toString() && (
-                        <div className="mt-6 pt-6 border-t border-gray-100 space-y-6">
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900 mb-3">Recent Topics</h4>
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                                <div>
-                                  <p className="font-medium">SDF application techniques for special needs patients</p>
-                                  <p className="text-sm text-gray-600">Posted by Dr. Sarah Chen • 2 hours ago</p>
-                                </div>
-                                <span className="text-emerald-600 text-sm font-medium">12 replies</span>
-                              </div>
-                              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                                <div>
-                                  <p className="font-medium">Caries risk assessment in patients with disabilities</p>
-                                  <p className="text-sm text-gray-600">Posted by Dr. Michael Torres • 1 day ago</p>
-                                </div>
-                                <span className="text-emerald-600 text-sm font-medium">8 replies</span>
-                              </div>
+                            <div className="text-sm text-gray-500 flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5" />
+                              {formatDate(classroom.published_date)}
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-3">
-                            <button className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-medium hover:shadow-md">
-                              Join Discussion
-                            </button>
-                            <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                              View All Topics
-                            </button>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-700 transition-colors">
+                            {classroom.title}
+                          </h3>
+                          
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1.5">
+                              <Users className="w-4 h-4" />
+                              Speaker: {classroom.speaker}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <MessageSquare className="w-4 h-4" />
+                              Interactive discussion
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex-shrink-0">
+                          <a
+                            href={classroom.google_classroom_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-700 font-medium rounded-xl hover:bg-emerald-100 transition-all duration-300 group/link"
+                          >
+                            <span>Join Discussion</span>
+                            <ArrowUpRight className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                          </a>
+                        </div>
+                      </div>
+                      
+                      {status === 'upcoming' && (
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="inline-flex items-center gap-2 text-sm text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">
+                            <Calendar className="w-4 h-4" />
+                            Discussion opens {formatDate(classroom.published_date)}
                           </div>
                         </div>
                       )}
                     </div>
-                  </Card>
-                </div>
-              ))}
-            </div>
-
-            {/* Load More */}
-            <div className="flex justify-center pt-4">
-              <button className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors font-medium">
-                Load More Discussions
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column - Learning Objectives (4/12) */}
-          <div className="lg:col-span-4 space-y-8">
-            
-            {/* Learning Card - Emerald theme */}
-            <Card className="p-6 sticky top-24">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-emerald-100 to-emerald-50 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl">🎯</span>
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Learning Objectives</h2>
-                  <p className="text-sm text-gray-600">Through course discussions</p>
-                </div>
+                  )
+                })}
               </div>
-              
-              <div className="space-y-4">
-                {learningObjectives.map((objective, index) => (
-                  <div key={index} className="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-sm font-bold">{index + 1}</span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed text-sm">{objective}</p>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="font-bold text-gray-900 mb-4">Discussion Guidelines</h3>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-sm">✓</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Respect diverse perspectives and experiences</p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-sm">✓</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Share evidence-based practices and clinical experiences</p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-sm">✓</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Maintain patient confidentiality in case discussions</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-          
-
-            
-          </div>
+            </>
+          )}
         </div>
-      </main>
 
-      {/* New Forum Modal - Emerald theme */}
-      {showForumModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Create New Forum</h2>
-                <p className="text-gray-600 mt-1">Start a dedicated discussion space</p>
+        {/* Footer Note */}
+        {discussionClassrooms.length > 0 && (
+          <div className="mt-10 pt-6 border-t border-gray-200">
+            <div className="flex items-start gap-3 text-sm text-gray-600">
+              <div className="w-5 h-5 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Globe className="w-3 h-3 text-blue-600" />
               </div>
-              <button
-                onClick={() => setShowForumModal(false)}
-                className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Forum Name *
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Advanced Behavioral Management"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Category
-                </label>
-                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                  <option>Clinical Techniques</option>
-                  <option>Patient Management</option>
-                  <option>Practice Management</option>
-                  <option>Equipment & Technology</option>
-                  <option>Research & Evidence</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  placeholder="What will this forum focus on? What topics will be discussed?"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Forum Image (Optional)
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-emerald-400 transition-colors cursor-pointer">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-50 flex items-center justify-center">
-                    <span className="text-2xl text-emerald-500">🖼️</span>
-                  </div>
-                  <p className="text-gray-600">Click to upload or drag and drop</p>
-                  <p className="text-sm text-gray-500 mt-1">Recommended: 98x98px • JPG, PNG, BMP</p>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl p-6 border border-emerald-100">
-                <h3 className="font-bold text-gray-900 mb-3">Community Guidelines</h3>
-                <div className="space-y-3 text-sm text-gray-700">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-xs">1</span>
-                    </div>
-                    <p>The User is responsible for all content uploaded, posted, or transmitted through the forum.</p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-xs">2</span>
-                    </div>
-                    <p>The User undertakes to not upload unlawful material, harass others, or violate intellectual property rights.</p>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-5 h-5 bg-emerald-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-emerald-600 text-xs">3</span>
-                    </div>
-                    <p>The User will use the Services at his/her own risk and is responsible for verifying clinical information.</p>
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <label className="flex items-center cursor-pointer">
-                    <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mr-3" />
-                    <span className="text-gray-700">I accept the terms and conditions and community guidelines</span>
-                  </label>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-end space-x-4 pt-4">
-                <button
-                  onClick={() => setShowForumModal(false)}
-                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              <p>
+                All discussions are hosted on Google Classroom. You'll need to sign in with your Google account to participate.
+                <a 
+                  href="https://classroom.google.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline ml-1"
                 >
-                  Cancel
-                </button>
-                <button className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-medium hover:shadow-md transition-all duration-200">
-                  Create Forum
-                </button>
-              </div>
+                  Learn more
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </p>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* New Topic Modal - Emerald theme */}
-      {showTopicModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Start New Discussion</h2>
-                <p className="text-gray-600 mt-1">Share your question or insight with the community</p>
-              </div>
-              <button
-                onClick={() => setShowTopicModal(false)}
-                className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              <div className="flex items-center p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border border-emerald-100">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 flex items-center justify-center mr-4">
-                  <span className="text-white text-xl">💬</span>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Posting to: Preventive Health Considerations Forum</p>
-                  <p className="text-sm text-gray-600">Your discussion will be visible to all course participants</p>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Topic Title *
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Effective communication strategies for patients with autism"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Category
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {['Question', 'Case Study', 'Resource Share', 'Best Practice', 'Research'].map((category) => (
-                    <button
-                      key={category}
-                      className="px-4 py-2 border border-gray-300 rounded-full hover:border-emerald-400 hover:bg-emerald-50 transition-colors"
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  Discussion Content *
-                </label>
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <div className="border-b border-gray-300 bg-gray-50 px-4 py-2">
-                    <div className="flex items-center space-x-4 text-gray-600">
-                      <button className="hover:text-gray-900">B</button>
-                      <button className="hover:text-gray-900">I</button>
-                      <button className="hover:text-gray-900">🔗</button>
-                      <button className="hover:text-gray-900">📎</button>
-                    </div>
-                  </div>
-                  <textarea
-                    rows={8}
-                    placeholder="Share your question, clinical experience, or insight. Be specific to help others provide helpful responses."
-                    className="w-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="flex items-center space-x-4">
-                  <button className="flex items-center text-gray-600 hover:text-gray-900">
-                    <span className="mr-2">📎</span>
-                    Attach Files
-                  </button>
-                  <button className="flex items-center text-gray-600 hover:text-gray-900">
-                    <span className="mr-2">👁️</span>
-                    Preview
-                  </button>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => setShowTopicModal(false)}
-                    className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-                  >
-                    Save Draft
-                  </button>
-                  <button className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-medium hover:shadow-md transition-all duration-200">
-                    Publish Discussion
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

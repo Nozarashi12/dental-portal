@@ -23,6 +23,7 @@ interface Classroom {
   expiration_date: string | null
   discussion_enabled: boolean
   assessment_link: string
+  google_classroom_link: string
 }
 
 interface EditClassroomFormProps {
@@ -53,6 +54,7 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
       : '',
     discussion_enabled: classroom.discussion_enabled ?? true,
     assessment_link: classroom.assessment_link || '',
+    google_classroom_link: classroom.google_classroom_link || '',
   })
 
   useEffect(() => {
@@ -421,6 +423,28 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
                     </label>
                   </div>
 
+                  {/* Google Classroom Link - Only shown when discussion is enabled */}
+                  {form.discussion_enabled && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <div className="flex items-center gap-2">
+                          <Link className="w-4 h-4" />
+                          Google Classroom Link (Optional)
+                        </div>
+                      </label>
+                      <input
+                        type="url"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                        placeholder="https://classroom.google.com/..."
+                        value={form.google_classroom_link}
+                        onChange={(e) => handleChange('google_classroom_link', e.target.value)}
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Link to Google Classroom for this session
+                      </p>
+                    </div>
+                  )}
+
                   {/* Assessment Link */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -517,6 +541,21 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
                   {classroom.discussion_enabled ? 'Enabled' : 'Disabled'}
                 </p>
               </div>
+              {classroom.google_classroom_link && (
+                <div>
+                  <p className="text-sm text-gray-500">Google Classroom Link</p>
+                  <p className="font-medium text-gray-900 truncate">
+                    <a 
+                      href={classroom.google_classroom_link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      View Link
+                    </a>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
