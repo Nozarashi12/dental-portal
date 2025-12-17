@@ -76,6 +76,15 @@ interface Category {
   count: number;
 }
 
+// Interface for statistics data
+interface Statistics {
+  totalCourses: number;
+  totalCategories: number;
+  totalAuthors: number;
+  totalClassrooms: number;
+  coursesWithClassrooms: number;
+}
+
 // Format date function
 const formatDate = (dateString: string) => {
   if (!dateString) return 'Date not available';
@@ -102,9 +111,19 @@ export default function LandingPage() {
   const [specialties, setSpecialties] = useState<Specialty[]>([])
   const [loading, setLoading] = useState({
     courses: true,
-    specialties: true
+    specialties: true,
+    statistics: true
   })
   const [error, setError] = useState<string | null>(null)
+  
+  // Statistics state
+  const [statistics, setStatistics] = useState<Statistics>({
+    totalCourses: 0,
+    totalCategories: 0,
+    totalAuthors: 0,
+    totalClassrooms: 0,
+    coursesWithClassrooms: 0
+  })
   
   // UI State
   const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all')
@@ -127,7 +146,7 @@ export default function LandingPage() {
     loadSearchHistory()
   }, [])
 
-  // Fetch courses and specialties from backend
+  // Fetch courses, specialties and statistics from backend
   const fetchData = async () => {
     try {
       setError(null)
@@ -145,12 +164,43 @@ export default function LandingPage() {
         setSpecialties(specialtiesData)
       }
       
+      // Fetch statistics from dedicated endpoint
+      const statsRes = await fetch('/api/admin/statistics')
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setStatistics(statsData)
+      } else {
+        // Calculate statistics from courses data if API fails
+        calculateStatisticsFromCourses(coursesData)
+      }
+      
     } catch (err) {
       console.error('Error fetching data:', err)
       setError('Failed to load data. Please try again later.')
+      
+      // Try to calculate from existing data if available
+      if (courses.length > 0) {
+        calculateStatisticsFromCourses(courses)
+      }
     } finally {
-      setLoading({ courses: false, specialties: false })
+      setLoading({ courses: false, specialties: false, statistics: false })
     }
+  }
+
+  // Calculate statistics from courses data
+  const calculateStatisticsFromCourses = (coursesData: Course[]) => {
+    const uniqueCategories = [...new Set(coursesData.map(c => c.category).filter(Boolean))]
+    const uniqueAuthors = [...new Set(coursesData.map(c => c.author).filter(Boolean))]
+    const coursesWithClassrooms = coursesData.filter(c => c.classroom_count && c.classroom_count > 0).length
+    const totalClassrooms = coursesData.reduce((acc, course) => acc + (course.classroom_count || 0), 0)
+    
+    setStatistics({
+      totalCourses: coursesData.length,
+      totalCategories: uniqueCategories.length,
+      totalAuthors: uniqueAuthors.length,
+      coursesWithClassrooms,
+      totalClassrooms
+    })
   }
 
   // Extract unique categories from courses
@@ -364,15 +414,6 @@ export default function LandingPage() {
     
     return result
   }, [courses, selectedCategory, selectedSpecialty, searchQuery, sortBy, specialties])
-
-  // Calculate statistics
-  const stats = {
-    totalCourses: courses.length,
-    totalCategories: [...new Set(courses.map(c => c.category).filter(Boolean))].length,
-    totalAuthors: [...new Set(courses.map(c => c.author).filter(Boolean))].length,
-    coursesWithClassrooms: courses.filter(c => c.classroom_count && c.classroom_count > 0).length,
-    totalClassrooms: courses.reduce((acc, course) => acc + (course.classroom_count || 0), 0)
-  }
 
   // Popular searches based on course categories
   const popularSearches = [
@@ -628,31 +669,31 @@ export default function LandingPage() {
                 </div>
               </div>
               
-              {/* Quick Stats */}
+              {/* Quick Stats - Updated to use statistics state */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                 <QuickStat 
-                  value={`${stats.totalCourses}+`}
+                  value={`${statistics.totalCourses}+`}
                   label="Accredited Courses"
                   icon={<BookOpen className="w-5 h-5" />}
-                  loading={loading.courses}
+                  loading={loading.statistics}
                 />
                 <QuickStat 
-                  value={`${stats.totalCategories}+`}
+                  value={`${statistics.totalCategories}+`}
                   label="Categories"
                   icon={<Filter className="w-5 h-5" />}
-                  loading={loading.courses}
+                  loading={loading.statistics}
                 />
                 <QuickStat 
-                  value={`${stats.totalAuthors}+`}
+                  value={`${statistics.totalAuthors}+`}
                   label="Expert Faculty"
                   icon={<GraduationCap className="w-5 h-5" />}
-                  loading={loading.courses}
+                  loading={loading.statistics}
                 />
                 <QuickStat 
-                  value={`${stats.totalClassrooms}+`}
+                  value={`${statistics.totalClassrooms}+`}
                   label="Classrooms"
                   icon={<PlayCircle className="w-5 h-5" />}
-                  loading={loading.courses}
+                  loading={loading.statistics}
                 />
               </div>
             </div>
@@ -734,7 +775,7 @@ export default function LandingPage() {
                 {selectedCategory === 'all' && <CheckCircle className="w-4 h-4 mr-2" />}
                 All Categories
                 <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">
-                  {stats.totalCourses}
+                  {statistics.totalCourses}
                 </span>
               </button>
               
@@ -891,7 +932,7 @@ export default function LandingPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <p className="text-sm text-emerald-800">
-                        Showing {filteredCourses.length} of {stats.totalCourses} courses
+                        Showing {filteredCourses.length} of {statistics.totalCourses} courses
                         {selectedCategory !== 'all' && ` in category "${selectedCategory}"`}
                         {selectedSpecialty !== 'all' && ` in specialty "${specialties.find(s => s.id === selectedSpecialty)?.name}"`}
                         {searchQuery && ` matching "${searchQuery}"`}

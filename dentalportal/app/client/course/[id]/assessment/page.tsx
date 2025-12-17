@@ -444,7 +444,7 @@ export default function AssessmentPage() {
               All assessments are managed through the course classroom system.
             </p>
             <button 
-              onClick={() => router.push(`/admin/courses/${courseId}`)}
+              onClick={() => router.push(`/client/course/${courseId}/classroom`)}
               className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 font-medium"
             >
               View Course Details
