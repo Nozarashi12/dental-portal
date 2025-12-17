@@ -77,6 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: 'Classrooms', href: '/admin/classrooms', icon: <School className="w-4 h-4" /> },
     { label: 'Users', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
     { label: 'Profile', href: '/admin/profile', icon: <User className="w-4 h-4" /> },
+    { label: 'certificates', href: '/admin/certificates', icon: <User className="w-4 h-4" /> },
   ];
 
   return (
