@@ -326,21 +326,9 @@ export default function ClassroomPage() {
                 </div>
               </div>
               
-              <div className="flex items-center bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl">
-                <BookOpen className="w-8 h-8 mr-4 text-emerald-300" />
-                <div>
-                  <div className="text-sm text-emerald-200/80">Total Content</div>
-                  <div className="font-bold text-lg">{formatDuration(stats.totalDuration)}</div>
-                </div>
-              </div>
               
-              <div className="flex items-center bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl">
-                <Award className="w-8 h-8 mr-4 text-emerald-300" />
-                <div>
-                  <div className="text-sm text-emerald-200/80">CE Credits</div>
-                  <div className="font-bold text-lg">{stats.totalCE} Credits</div>
-                </div>
-              </div>
+              
+             
               
               {stats.totalViews > 0 && (
                 <div className="flex items-center bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl">
@@ -632,13 +620,7 @@ export default function ClassroomPage() {
                           
                           {/* Lecture Details Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="bg-gray-50 p-4 rounded-xl">
-                              <div className="text-sm text-gray-600 mb-1">Duration</div>
-                              <div className="font-bold text-gray-900 flex items-center">
-                                <Clock className="w-4 h-4 mr-2 text-emerald-600" />
-                                {formatDuration(lecture.duration_minutes)}
-                              </div>
-                            </div>
+                            
                             
                             {lecture.published_date && (
                               <div className="bg-gray-50 p-4 rounded-xl">
@@ -796,8 +778,6 @@ export default function ClassroomPage() {
                     <div className="space-y-4">
                       {[
                         { label: 'Total Lectures', value: stats.totalLectures, icon: BookOpen, color: 'emerald' },
-                        { label: 'Total Duration', value: formatDuration(stats.totalDuration), icon: Clock, color: 'blue' },
-                        { label: 'CE Credits', value: stats.totalCE, icon: Award, color: 'purple' },
                         { label: 'Videos Available', value: stats.lecturesWithVideo, icon: PlayCircle, color: 'red' },
                         { label: 'Assessments', value: stats.lecturesWithAssessment, icon: FileText, color: 'indigo' },
                       ].map((stat, idx) => (
@@ -817,74 +797,7 @@ export default function ClassroomPage() {
               </Card>
             )}
 
-            {/* Quick Actions Card */}
-            <Card className="p-6 shadow-xl">
-              <div className="flex items-center mb-6">
-                <div className="w-2 h-10 bg-gradient-to-b from-emerald-600 to-green-600 rounded-full mr-4"></div>
-                <h3 className="text-lg font-bold text-gray-900">Quick Actions</h3>
-              </div>
-              
-              <div className="space-y-3">
-                <button 
-                  onClick={() => {
-                    const printContent = document.querySelector('.lg\\:col-span-2')
-                    if (printContent) {
-                      const printWindow = window.open('', '_blank')
-                      printWindow?.document.write(`
-                        <html>
-                          <head>
-                            <title>${course?.title || 'Course'} - Syllabus</title>
-                            <style>
-                              body { font-family: Arial, sans-serif; padding: 20px; }
-                              h1 { color: #065f46; }
-                              .lecture { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
-                            </style>
-                          </head>
-                          <body>
-                            <h1>${course?.title || 'Course'} - Lecture Syllabus</h1>
-                            ${printContent.innerHTML}
-                          </body>
-                        </html>
-                      `)
-                      printWindow?.document.close()
-                      printWindow?.print()
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 rounded-xl border border-emerald-200 transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center">
-                    <Download className="w-5 h-5 text-emerald-600 mr-3" />
-                    <span className="font-medium text-gray-900">Download Syllabus</span>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-gray-400" />
-                </button>
-                
-                <button 
-                  onClick={() => {
-                    const firstLecture = filteredClassrooms[0]
-                    if (firstLecture) {
-                      setExpandedLecture(firstLecture.id)
-                      document.querySelector('.lg\\:col-span-2')?.scrollIntoView({ behavior: 'smooth' })
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl border border-blue-200 transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center">
-                    <PlayCircle className="w-5 h-5 text-blue-600 mr-3" />
-                    <span className="font-medium text-gray-900">Start First Lecture</span>
-                  </div>
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
-                </button>
-                
-                <Link
-                  href={`/client/course/${courseId}`}
-                  className="block w-full text-center p-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all shadow-lg hover:shadow-xl"
-                >
-                  Back to Course Overview
-                </Link>
-              </div>
-            </Card>
-
+           
             {/* Support Card */}
             <Card className="p-6 shadow-xl">
               <div className="flex items-center mb-6">
@@ -911,15 +824,11 @@ export default function ClassroomPage() {
                 <div className="pt-4 border-t border-gray-200">
                   <h4 className="font-semibold text-gray-900 mb-4">Learning Resources</h4>
                   <div className="space-y-3">
-                    <a href="#" className="flex items-center p-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group">
+                    <a href="/client/faq" className="flex items-center p-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group">
                       <BookOpen className="w-5 h-5 mr-3 text-gray-400 group-hover:text-emerald-600" />
                       <span className="font-medium">Student Guide & FAQs</span>
                     </a>
-                    <a href="#" className="flex items-center p-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group">
-                      <Award className="w-5 h-5 mr-3 text-gray-400 group-hover:text-emerald-600" />
-                      <span className="font-medium">CE Credit Guidelines</span>
-                    </a>
-                    <a href="#" className="flex items-center p-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group">
+                    <a href="/client/faq" className="flex items-center p-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group">
                       <GraduationCap className="w-5 h-5 mr-3 text-gray-400 group-hover:text-emerald-600" />
                       <span className="font-medium">Yenepoya Dental College</span>
                     </a>
