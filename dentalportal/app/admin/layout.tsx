@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, LogOut, User, BookOpen, Home, Users, School, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LogOut, User, BookOpen, FileText, Users, School, LayoutDashboard } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "/admin";
@@ -77,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: 'Classrooms', href: '/admin/classrooms', icon: <School className="w-4 h-4" /> },
     { label: 'Users', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
     { label: 'Profile', href: '/admin/profile', icon: <User className="w-4 h-4" /> },
-    { label: 'certificates', href: '/admin/certificates', icon: <User className="w-4 h-4" /> },
+    { label: 'certificates', href: '/admin/certificates', icon: <FileText className="w-4 h-4" /> },
   ];
 
   return (
