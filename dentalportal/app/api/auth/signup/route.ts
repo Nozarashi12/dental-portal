@@ -1,3 +1,4 @@
+// app/api/auth/signup/route.ts
 import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -35,7 +36,11 @@ export async function POST(req: Request) {
       { expiresIn: '1h' }
     )
 
-    const response = NextResponse.json({ role: role || 'client' })
+    // ✅ FIX: Return token in JSON response (just like login API does)
+    const response = NextResponse.json({ 
+      role: role || 'client', 
+      token: token // ✅ ADD THIS LINE - CRITICAL!
+    })
 
     response.cookies.set('token', token, {
       httpOnly: true,
