@@ -86,8 +86,8 @@ export default function SignupPage() {
           <div className="hidden md:block w-px h-8 bg-gray-300"></div>
 
           <div>
-            <h1 className="font-bold text-gray-900 text-sm">Yenepoya Dental</h1>
-            <p className="text-xs text-emerald-700">CDE Platform</p>
+           <h1 className="font-bold text-gray-900 text-sm">RAYYAN</h1>
+            <p className="text-xs text-emerald-700">LMS Platform</p>
           </div>
         </Link>
       </div>
