@@ -455,9 +455,9 @@ export default function LandingPage() {
               {/* Accent Badge */}
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-emerald-200 text-emerald-700 text-sm font-medium mb-8 shadow-sm hover:shadow-md transition-shadow">
                 <Shield className="w-4 h-4 mr-2" />
-                <span className="font-semibold">DCI Accredited</span>
+                <span className="font-semibold">Smart Learning</span>
                 <span className="mx-2">•</span>
-                <span>NABH Recognized</span>
+                <span>Dental Focused</span>
               </div>
               
               {/* Main Heading */}

@@ -106,7 +106,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div className="hidden md:block w-px h-8 bg-gray-300"></div>
               <div className="hidden md:block">
-                <h1 className="text-base font-semibold text-gray-900 leading-tight">Yenepoya Dental</h1>
+                <h1 className="text-base font-semibold text-gray-900 leading-tight">RAYYAN LMS</h1>
                 <p className="text-xs text-emerald-700 font-medium">Admin Panel</p>
               </div>
             </Link>
