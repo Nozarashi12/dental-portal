@@ -163,7 +163,7 @@ export default function Navbar() {
               </div>
               <div className="hidden md:block w-px h-8 bg-gray-300"></div>
               <div className="hidden md:block">
-                <h1 className="text-base font-semibold text-gray-900 leading-tight">Yenepoya Dental</h1>
+                <h1 className="text-base font-semibold text-gray-900 leading-tight">Dental Courses</h1>
                 <p className="text-xs text-emerald-700 font-medium">Continuing Education</p>
               </div>
             </Link>
