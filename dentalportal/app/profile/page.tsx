@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '../Client/Navbar'
-import Footer from '../Client/Footer'
+import Navbar from '../client/Navbar'
+import Footer from '../client/Footer'
 import Cookies from 'js-cookie'
 import { 
   User, Mail, Phone, MapPin, Calendar, GraduationCap, BookOpen,
