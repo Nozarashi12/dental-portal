@@ -152,7 +152,7 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
       {/* Success Message */}
       {success && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3 animate-in slide-in-from-top">
-          <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
           <div className="text-emerald-800 font-medium">{success}</div>
         </div>
       )}
@@ -160,7 +160,7 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
       {/* Error Message */}
       {errors.submit && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 animate-in slide-in-from-top">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
           <div className="text-red-800 font-medium">{errors.submit}</div>
         </div>
       )}
@@ -419,7 +419,7 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
                         onChange={(e) => handleChange('discussion_enabled', e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                     </label>
                   </div>
 
@@ -564,19 +564,19 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Editing Tips</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
-                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs text-blue-600 font-bold">1</span>
                 </div>
                 <span className="text-sm text-gray-700">Update video URL if content changes</span>
               </li>
               <li className="flex items-start gap-2">
-                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs text-blue-600 font-bold">2</span>
                 </div>
                 <span className="text-sm text-gray-700">Review learning objectives regularly</span>
               </li>
               <li className="flex items-start gap-2">
-                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-xs text-blue-600 font-bold">3</span>
                 </div>
                 <span className="text-sm text-gray-700">Consider expiration for time-sensitive content</span>
