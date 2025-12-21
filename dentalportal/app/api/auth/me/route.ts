@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { verifyToken } from '@/lib/jwt'
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value
@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET!)
+    const user = verifyToken(token)
     return NextResponse.json({
       loggedIn: true,
       user
