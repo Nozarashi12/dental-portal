@@ -13,20 +13,31 @@ function loadEnvIfMissing() {
 
 function assertRequiredEnv() {
   const missing = requiredDbEnvVars.filter((k) => !process.env[k]);
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
+  return missing;
 }
 
 loadEnvIfMissing();
-assertRequiredEnv();
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
-});
+const missingEnv = assertRequiredEnv();
+
+const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306;
+const resolvedPort = Number.isFinite(port) ? port : 3306;
+
+const pool =
+  missingEnv.length > 0
+    ? {
+        query: async () => {
+          throw new Error(
+            `Missing required environment variables: ${missingEnv.join(', ')}`
+          );
+        },
+      }
+    : mysql.createPool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        port: resolvedPort,
+      });
 
 export default pool;
