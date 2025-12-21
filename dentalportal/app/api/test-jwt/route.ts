@@ -21,7 +21,7 @@ export async function GET() {
       tokenVerified: !!decoded,
       payload: decoded
     })
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       success: false,
       error: error?.message || 'Unknown error',
