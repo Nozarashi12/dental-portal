@@ -1,5 +1,9 @@
 const { createServer } = require("http");
 const next = require("next");
+const dotenv = require('dotenv');
+
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const port = process.env.PORT || 3000;
 const dev = process.env.NODE_ENV !== "production";
