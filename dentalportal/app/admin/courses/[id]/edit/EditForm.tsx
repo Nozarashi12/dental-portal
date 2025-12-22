@@ -373,7 +373,7 @@ export default function EditForm({ course }: { course: any }) {
                       </div>
                     </label>
                     <select
-                      value={form.specialty_id || ''}
+                      value={form.specialty_id?.toString() || ''}
                       onChange={(e) => handleChange('specialty_id', e.target.value || null)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                       disabled={fetching}
