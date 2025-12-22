@@ -6,10 +6,15 @@ import { jwtVerify } from 'jose'
 
 // Ensure JWT_SECRET is available at runtime
 function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is not defined. Please set it in your hosting environment.')
+  // Temporary hardcoded solution for Hostinger deployment
+  const hardcodedSecret = 'meatballsinslovakia'
+  const secret = process.env.JWT_SECRET || hardcodedSecret
+  
+  // In production, log a warning if using hardcoded value
+  if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.warn('WARNING: Using hardcoded JWT_SECRET. Please set JWT_SECRET environment variable in Hostinger.')
   }
+  
   return secret
 }
 
