@@ -32,32 +32,37 @@ async function getCourses() {
 async function getCourseStats() {
   try {
     // Total courses
-    const [[{ totalCourses }]] = await pool.query('SELECT COUNT(*) as totalCourses FROM courses');
+    const [totalCoursesResult] = await pool.query('SELECT COUNT(*) as totalCourses FROM courses');
+    const totalCourses = (totalCoursesResult as any)[0]?.totalCourses || 0;
     
     // Courses with classrooms
-    const [[{ activeCourses }]] = await pool.query(`
+    const [activeCoursesResult] = await pool.query(`
       SELECT COUNT(DISTINCT c.id) as activeCourses 
       FROM courses c
       INNER JOIN classrooms cl ON c.id = cl.course_id
       WHERE cl.published_date IS NOT NULL
     `);
+    const activeCourses = (activeCoursesResult as any)[0]?.activeCourses || 0;
     
     // Total classrooms
-    const [[{ totalClassrooms }]] = await pool.query('SELECT COUNT(*) as totalClassrooms FROM classrooms');
+    const [totalClassroomsResult] = await pool.query('SELECT COUNT(*) as totalClassrooms FROM classrooms');
+    const totalClassrooms = (totalClassroomsResult as any)[0]?.totalClassrooms || 0;
     
     // Today's courses (created today)
-    const [[{ todayCourses }]] = await pool.query(`
+    const [todayCoursesResult] = await pool.query(`
       SELECT COUNT(*) as todayCourses 
       FROM courses 
       WHERE DATE(created_at) = CURDATE()
     `);
+    const todayCourses = (todayCoursesResult as any)[0]?.todayCourses || 0;
     
     // Classroom speakers (unique speakers across all classrooms)
-    const [[{ totalSpeakers }]] = await pool.query(`
+    const [totalSpeakersResult] = await pool.query(`
       SELECT COUNT(DISTINCT speaker) as totalSpeakers 
       FROM classrooms 
       WHERE speaker IS NOT NULL AND speaker != ''
     `);
+    const totalSpeakers = (totalSpeakersResult as any)[0]?.totalSpeakers || 0;
     
     return { 
       totalCourses, 

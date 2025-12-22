@@ -7,6 +7,9 @@ import {
   Search, Filter, UserPlus, Download 
 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Fetch users from DB
 async function getUsers() {
   try {
@@ -28,16 +31,23 @@ async function getUsers() {
 // Fetch stats with additional insights
 async function getUserStats() {
   try {
-    const [[{ totalUsers }]] = await pool.query('SELECT COUNT(*) as totalUsers FROM users')
-    const [[{ adminCount }]] = await pool.query('SELECT COUNT(*) as adminCount FROM users WHERE role = "admin"')
-    const [[{ clientCount }]] = await pool.query('SELECT COUNT(*) as clientCount FROM users WHERE role = "client"')
-    const [[{ todayUsers }]] = await pool.query(`
+    const [totalUsersResult] = await pool.query('SELECT COUNT(*) as totalUsers FROM users')
+    const [adminCountResult] = await pool.query('SELECT COUNT(*) as adminCount FROM users WHERE role = "admin"')
+    const [clientCountResult] = await pool.query('SELECT COUNT(*) as clientCount FROM users WHERE role = "client"')
+    const [todayUsersResult] = await pool.query(`
       SELECT COUNT(*) as todayUsers FROM users WHERE DATE(created_at) = CURDATE()
     `)
-    const [[{ weekUsers }]] = await pool.query(`
+    const [weekUsersResult] = await pool.query(`
       SELECT COUNT(*) as weekUsers FROM users 
       WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     `)
+    
+    const totalUsers = (totalUsersResult as any)[0]?.totalUsers || 0
+    const adminCount = (adminCountResult as any)[0]?.adminCount || 0
+    const clientCount = (clientCountResult as any)[0]?.clientCount || 0
+    const todayUsers = (todayUsersResult as any)[0]?.todayUsers || 0
+    const weekUsers = (weekUsersResult as any)[0]?.weekUsers || 0
+    
     return { totalUsers, adminCount, clientCount, todayUsers, weekUsers }
   } catch (error) {
     console.error('Failed to fetch user stats:', error)
