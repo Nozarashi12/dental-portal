@@ -69,11 +69,19 @@ export default function AdminCertificatesPage() {
       })
       setError('')
       
+      // 👇 ADD credentials: 'include' to all fetch calls
       const [usersRes, coursesRes, certsRes] = await Promise.all([
-        fetch('/api/admin/users'),
-        fetch('/api/admin/courses'),
-        fetch('/api/admin/certificates')
+        fetch('/api/admin/users', { credentials: 'include' }),
+        fetch('/api/admin/courses', { credentials: 'include' }),
+        fetch('/api/admin/certificates', { credentials: 'include' })
       ])
+
+      // 👇 Handle 401 Unauthorized errors
+      if (usersRes.status === 401 || coursesRes.status === 401 || certsRes.status === 401) {
+        // Redirect to login if unauthorized
+        window.location.href = '/login'
+        throw new Error('Session expired. Please login again.')
+      }
 
       if (!usersRes.ok) throw new Error('Failed to fetch users')
       if (!coursesRes.ok) throw new Error('Failed to fetch courses')
@@ -153,8 +161,15 @@ export default function AdminCertificatesPage() {
           user_id: parseInt(selectedUserId),
           course_id: parseInt(selectedCourseId),
           status: 'approved'
-        })
+        }),
+        credentials: 'include' // 👈 ADD THIS
       })
+
+      // 👇 Handle 401 Unauthorized
+      if (res.status === 401) {
+        window.location.href = '/login'
+        throw new Error('Session expired. Please login again.')
+      }
 
       const data = await res.json()
 
@@ -191,8 +206,15 @@ export default function AdminCertificatesPage() {
           issued_at: editStatus === 'approved' && !editingCertificate.issued_at 
             ? new Date().toISOString() 
             : editingCertificate.issued_at
-        })
+        }),
+        credentials: 'include' // 👈 ADD THIS
       })
+
+      // 👇 Handle 401 Unauthorized
+      if (res.status === 401) {
+        window.location.href = '/login'
+        throw new Error('Session expired. Please login again.')
+      }
 
       const data = await res.json()
 
@@ -222,7 +244,14 @@ export default function AdminCertificatesPage() {
     try {
       const res = await fetch(`/api/admin/certificates/${deletingCertificateId}`, {
         method: 'DELETE',
+        credentials: 'include' // 👈 ADD THIS
       })
+
+      // 👇 Handle 401 Unauthorized
+      if (res.status === 401) {
+        window.location.href = '/login'
+        throw new Error('Session expired. Please login again.')
+      }
 
       const data = await res.json()
 
