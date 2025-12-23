@@ -57,10 +57,10 @@ export default function Footer() {
             <h4 className="font-semibold text-white mb-6">Quick Links</h4>
             <ul className="space-y-3">
               <FooterLink href="/">Home</FooterLink>
-              <FooterLink href="/catalog">Course Catalog</FooterLink>
-              <FooterLink href="/specialties">Specialties</FooterLink>
-              <FooterLink href="/programs">Featured Programs</FooterLink>
-              <FooterLink href="/faq">FAQs</FooterLink>
+              <FooterLink href="/">Course Catalog</FooterLink>
+              <FooterLink href="/">Specialties</FooterLink>
+              <FooterLink href="/">Featured Programs</FooterLink>
+              <FooterLink href="/">FAQs</FooterLink>
             </ul>
           </div>
 
@@ -68,11 +68,11 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-white mb-6">Resources</h4>
             <ul className="space-y-3">
-              <FooterLink href="/research">Research Library</FooterLink>
-              <FooterLink href="/faculty">Faculty Directory</FooterLink>
-              <FooterLink href="/accreditation">Accreditation</FooterLink>
-              <FooterLink href="/support">Support Center</FooterLink>
-              <FooterLink href="/contact">Contact Us</FooterLink>
+              <FooterLink href="/">Research Library</FooterLink>
+              <FooterLink href="/">Faculty Directory</FooterLink>
+              <FooterLink href="/">Accreditation</FooterLink>
+              <FooterLink href="/">Support Center</FooterLink>
+              <FooterLink href="/">Contact Us</FooterLink>
             </ul>
           </div>
 
@@ -129,19 +129,19 @@ Smart Learning              </div>
 
             <div className="flex space-x-6">
               <Link
-                href="/privacy"
+                href="/"
                 className="text-gray-400 hover:text-white text-sm transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                href="/terms"
+                href="/"
                 className="text-gray-400 hover:text-white text-sm transition-colors"
               >
                 Terms of Service
               </Link>
               <Link
-                href="/accessibility"
+                href="/"
                 className="text-gray-400 hover:text-white text-sm transition-colors"
               >
                 Accessibility
