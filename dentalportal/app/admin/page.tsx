@@ -6,6 +6,8 @@ import {
   Eye, Edit2 
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function AdminPage() {
   // Fetch stats with more detail
