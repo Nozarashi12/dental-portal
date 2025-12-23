@@ -127,7 +127,8 @@ export default function CourseCard({ course, onDelete }: any) {
           {/* Actions */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             <Link
-              href={`/admin/courses/${course.id}/classrooms`}
+                             href="/admin/classrooms"            
+
               className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
             >
               View Classrooms

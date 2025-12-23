@@ -227,13 +227,7 @@ export default function ClassroomsTable({ classrooms = [] }: ClassroomsTableProp
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
-                    <Link
-                      href={`/admin/classrooms/${classroom.id}`}
-                      className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                      title="View details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
+                   
                     <Link
                       href={`/admin/classrooms/${classroom.id}/edit`}
                       className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
