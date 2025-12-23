@@ -56,7 +56,7 @@ export default function AdminCertificatesPage() {
   const [selectedUserName, setSelectedUserName] = useState('')
   const [selectedCourseName, setSelectedCourseName] = useState('')
 
-  // Fetch all data
+  // Fetch all data - NO AUTH CHECKS
   const fetchData = async () => {
     try {
       setLoading({ 
@@ -69,23 +69,26 @@ export default function AdminCertificatesPage() {
       })
       setError('')
       
-      // 👇 ADD credentials: 'include' to all fetch calls
+      // Fetch data without authentication checks
       const [usersRes, coursesRes, certsRes] = await Promise.all([
-        fetch('/api/admin/users', { credentials: 'include' }),
-        fetch('/api/admin/courses', { credentials: 'include' }),
-        fetch('/api/admin/certificates', { credentials: 'include' })
+        fetch('/api/admin/users'),
+        fetch('/api/admin/courses'),
+        fetch('/api/admin/certificates')
       ])
 
-      // 👇 Handle 401 Unauthorized errors
-      if (usersRes.status === 401 || coursesRes.status === 401 || certsRes.status === 401) {
-        // Redirect to login if unauthorized
-        window.location.href = '/login'
-        throw new Error('Session expired. Please login again.')
+      // Handle response errors
+      if (!usersRes.ok) {
+        const errorText = await usersRes.text()
+        throw new Error(`Failed to fetch users: ${usersRes.status}`)
       }
-
-      if (!usersRes.ok) throw new Error('Failed to fetch users')
-      if (!coursesRes.ok) throw new Error('Failed to fetch courses')
-      if (!certsRes.ok) throw new Error('Failed to fetch certificates')
+      if (!coursesRes.ok) {
+        const errorText = await coursesRes.text()
+        throw new Error(`Failed to fetch courses: ${coursesRes.status}`)
+      }
+      if (!certsRes.ok) {
+        const errorText = await certsRes.text()
+        throw new Error(`Failed to fetch certificates: ${certsRes.status}`)
+      }
 
       const [usersData, coursesData, certsData] = await Promise.all([
         usersRes.json(),
@@ -93,9 +96,10 @@ export default function AdminCertificatesPage() {
         certsRes.json()
       ])
 
-      setUsers(usersData)
-      setCourses(coursesData)
-      setCertificates(certsData)
+      // Handle API response structure (may contain warning for development)
+      setUsers(usersData.data || usersData)
+      setCourses(coursesData.data || coursesData)
+      setCertificates(certsData.data || certsData)
     } catch (err: any) {
       setError(err.message || 'Error loading data')
       console.error('Error fetching data:', err)
@@ -132,7 +136,7 @@ export default function AdminCertificatesPage() {
     }
   }, [selectedUserId, selectedCourseId, users, courses])
 
-  // Create new certificate
+  // Create new certificate - NO AUTH CHECKS
   const createCertificate = async () => {
     if (!selectedUserId || !selectedCourseId) {
       setError('Please select both a user and a course')
@@ -161,15 +165,8 @@ export default function AdminCertificatesPage() {
           user_id: parseInt(selectedUserId),
           course_id: parseInt(selectedCourseId),
           status: 'approved'
-        }),
-        credentials: 'include' // 👈 ADD THIS
+        })
       })
-
-      // 👇 Handle 401 Unauthorized
-      if (res.status === 401) {
-        window.location.href = '/login'
-        throw new Error('Session expired. Please login again.')
-      }
 
       const data = await res.json()
 
@@ -189,7 +186,7 @@ export default function AdminCertificatesPage() {
     }
   }
 
-  // Update certificate status
+  // Update certificate status - NO AUTH CHECKS
   const updateCertificate = async () => {
     if (!editingCertificate) return
 
@@ -206,15 +203,8 @@ export default function AdminCertificatesPage() {
           issued_at: editStatus === 'approved' && !editingCertificate.issued_at 
             ? new Date().toISOString() 
             : editingCertificate.issued_at
-        }),
-        credentials: 'include' // 👈 ADD THIS
+        })
       })
-
-      // 👇 Handle 401 Unauthorized
-      if (res.status === 401) {
-        window.location.href = '/login'
-        throw new Error('Session expired. Please login again.')
-      }
 
       const data = await res.json()
 
@@ -233,7 +223,7 @@ export default function AdminCertificatesPage() {
     }
   }
 
-  // Delete certificate
+  // Delete certificate - NO AUTH CHECKS
   const deleteCertificate = async () => {
     if (!deletingCertificateId) return
 
@@ -243,15 +233,8 @@ export default function AdminCertificatesPage() {
 
     try {
       const res = await fetch(`/api/admin/certificates/${deletingCertificateId}`, {
-        method: 'DELETE',
-        credentials: 'include' // 👈 ADD THIS
+        method: 'DELETE'
       })
-
-      // 👇 Handle 401 Unauthorized
-      if (res.status === 401) {
-        window.location.href = '/login'
-        throw new Error('Session expired. Please login again.')
-      }
 
       const data = await res.json()
 
@@ -327,6 +310,19 @@ export default function AdminCertificatesPage() {
           </div>
         </div>
       )}
+
+      {/* Development Warning */}
+      {/* <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
+        <div className="flex items-center">
+          <svg className="h-5 w-5 text-yellow-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-yellow-800">Development Mode</p>
+            <p className="text-sm text-yellow-700">Authentication is disabled for testing purposes.</p>
+          </div>
+        </div>
+      </div> */}
 
       {/* Create Certificate Form */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -595,7 +591,6 @@ export default function AdminCertificatesPage() {
                         >
                           Delete
                         </button>
-                       
                       </div>
                     </td>
                   </tr>
