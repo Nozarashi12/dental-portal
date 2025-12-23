@@ -69,19 +69,7 @@ export default async function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-1">Manage user accounts, permissions, and access levels</p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4" />
-            Export
-          </button> */}
-          <Link
-            href="/admin/users/create"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm hover:shadow"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add User
-          </Link>
-        </div>
+        
       </div>
 
       {/* Stats Grid */}

@@ -3,7 +3,7 @@ import pool from '@/lib/db';
 import { 
   Users, BookOpen, DoorOpen, Calendar, 
   TrendingUp, Clock, UserCog, FileText,
-  Eye, Edit2, MoreVertical 
+  Eye, Edit2 
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -135,7 +135,7 @@ export default async function AdminPage() {
           </div>
           <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
             <Clock className="w-4 h-4" />
-            <span>Latest: {recentClassrooms[0]?.title?.substring(0, 20)}...</span>
+            <span>Latest: {recentClassrooms[0]?.title?.substring(0, 20) || 'No classrooms'}</span>
           </div>
         </div>
 
@@ -208,12 +208,22 @@ export default async function AdminPage() {
                     <span className="text-xs text-gray-500 whitespace-nowrap">
                       {formatDistanceToNow(new Date(course.created_at), { addSuffix: true })}
                     </span>
-                    <Link 
-                      href={`/admin/courses/${course.id}`}
-                      className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
+                    <div className="flex gap-1">
+                      <Link 
+                        href={`/client/course/${course.id}`}
+                        className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                        title="View Course"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <Link 
+                        href={`/admin/courses/${course.id}/edit`}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Course"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -267,6 +277,15 @@ export default async function AdminPage() {
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
                     </span>
+                    <div className="flex gap-1">
+                      <Link 
+                        href={`/admin/users/${user.id}/edit`}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit User"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -324,16 +343,16 @@ export default async function AdminPage() {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         <Link 
-                          href={`/admin/classrooms/${classroom.id}`}
+                          href={`/classrooms/${classroom.id}`}
                           className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                          title="View"
+                          title="View Classroom"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
                         <Link 
                           href={`/admin/classrooms/${classroom.id}/edit`}
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
+                          title="Edit Classroom"
                         >
                           <Edit2 className="w-4 h-4" />
                         </Link>
