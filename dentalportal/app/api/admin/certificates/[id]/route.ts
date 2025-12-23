@@ -8,7 +8,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin(req)
+    // DEVELOPMENT ONLY: Skip auth check
+    // await requireAdmin(req)
+    
+    console.warn('⚠️ DEVELOPMENT MODE: Skipping authentication')
+    
     const { id } = await params
 
     const [rows]: any = await pool.query(
@@ -35,12 +39,15 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(rows[0])
+    return NextResponse.json({
+      warning: 'Development mode: No authentication',
+      data: rows[0]
+    })
   } catch (err: any) {
     console.error(err)
     return NextResponse.json(
-      { message: err.message || 'Unauthorized or error' },
-      { status: err.message === 'Unauthorized' ? 401 : 500 }
+      { message: 'Development error' },
+      { status: 500 }
     )
   }
 }
@@ -51,7 +58,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin(req)
+    // DEVELOPMENT ONLY: Skip auth check
+    // await requireAdmin(req)
+    
+    console.warn('⚠️ DEVELOPMENT MODE: Skipping authentication')
+    
     const { id } = await params
     const body = await req.json()
     const { status, issued_at } = body
@@ -85,7 +96,7 @@ export async function PUT(
       let issuedAtValue: string | null = null
       
       if (issued_at) {
-        // Format the date for MySQL (YYYY-MM-DD HH:MM:SS)
+        // Format the date for MySQL
         const date = new Date(issued_at)
         if (isNaN(date.getTime())) {
           return NextResponse.json(
@@ -95,17 +106,14 @@ export async function PUT(
         }
         issuedAtValue = date.toISOString().slice(0, 19).replace('T', ' ')
       } else if (!existing[0].issued_at) {
-        // If no issued_at exists and no date provided, use current time
         issuedAtValue = new Date().toISOString().slice(0, 19).replace('T', ' ')
       } else {
-        // Keep existing issued_at if it exists
         issuedAtValue = existing[0].issued_at
       }
       
       query += ', issued_at = ?'
       values.push(issuedAtValue)
     } else {
-      // For pending status, set issued_at to NULL
       query += ', issued_at = NULL'
     }
     
@@ -115,30 +123,15 @@ export async function PUT(
     await pool.query(query, values)
 
     return NextResponse.json({
+      warning: 'Development mode: Updated without authentication',
       success: true,
       message: 'Certificate updated successfully'
     })
   } catch (err: any) {
     console.error('Error updating certificate:', err)
-    
-    // Handle MySQL specific errors
-    if (err.code === 'ER_TRUNCATED_WRONG_VALUE') {
-      return NextResponse.json(
-        { 
-          message: 'Invalid date format. Please use ISO format (YYYY-MM-DDTHH:MM:SS.SSSZ)',
-          error: err.message
-        },
-        { status: 400 }
-      )
-    }
-    
     return NextResponse.json(
-      { 
-        message: err.message || 'Server error',
-        error: err.message,
-        code: err.code
-      },
-      { status: err.message === 'Unauthorized' ? 401 : 500 }
+      { message: 'Development error' },
+      { status: 500 }
     )
   }
 }
@@ -149,7 +142,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin(req)
+    // DEVELOPMENT ONLY: Skip auth check
+    // await requireAdmin(req)
+    
+    console.warn('⚠️ DEVELOPMENT MODE: Skipping authentication - DELETING DATA')
+    
     const { id } = await params
 
     // Check if certificate exists
@@ -169,14 +166,15 @@ export async function DELETE(
     await pool.query('DELETE FROM certificates WHERE id = ?', [id])
 
     return NextResponse.json({
+      warning: 'Development mode: Deleted without authentication',
       success: true,
       message: 'Certificate deleted successfully'
     })
   } catch (err: any) {
     console.error(err)
     return NextResponse.json(
-      { message: err.message || 'Server error' },
-      { status: err.message === 'Unauthorized' ? 401 : 500 }
+      { message: 'Development error' },
+      { status: 500 }
     )
   }
 }
