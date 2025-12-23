@@ -9,29 +9,29 @@ import { formatDistanceToNow } from 'date-fns';
 
 export default async function AdminPage() {
   // Fetch stats with more detail
-  const [[{ coursesCount }]] = await pool.query('SELECT COUNT(*) as coursesCount FROM courses');
-  const [[{ classroomsCount }]] = await pool.query('SELECT COUNT(*) as classroomsCount FROM classrooms');
-  const [[{ usersCount }]] = await pool.query('SELECT COUNT(*) as usersCount FROM users');
-  const [[{ adminsCount }]] = await pool.query('SELECT COUNT(*) as adminsCount FROM users WHERE role = "admin"');
-  const [[{ clientsCount }]] = await pool.query('SELECT COUNT(*) as clientsCount FROM users WHERE role = "client"');
+  const [[{ coursesCount }]] = await pool.query(' SELECT SQL_NO_CACHE COUNT(*) as coursesCount FROM courses');
+  const [[{ classroomsCount }]] = await pool.query(' SELECT SQL_NO_CACHE COUNT(*) as classroomsCount FROM classrooms');
+  const [[{ usersCount }]] = await pool.query(' SELECT SQL_NO_CACHE COUNT(*) as usersCount FROM users');
+  const [[{ adminsCount }]] = await pool.query(' SELECT SQL_NO_CACHE COUNT(*) as adminsCount FROM users WHERE role = "admin"');
+  const [[{ clientsCount }]] = await pool.query(' SELECT SQL_NO_CACHE COUNT(*) as clientsCount FROM users WHERE role = "client"');
 
   // Fetch recent activities
   const [recentCourses] = await pool.query(`
-    SELECT id, title, author, category, created_at 
+     SELECT SQL_NO_CACHE id, title, author, category, created_at 
     FROM courses 
     ORDER BY created_at DESC 
     LIMIT 5
   `);
 
   const [recentUsers] = await pool.query(`
-    SELECT id, name, email, role, created_at 
+     SELECT SQL_NO_CACHE id, name, email, role, created_at 
     FROM users 
     ORDER BY created_at DESC 
     LIMIT 5
   `);
 
   const [recentClassrooms] = await pool.query(`
-    SELECT c.id, c.title, co.title as course_title, c.published_date, c.speaker
+     SELECT SQL_NO_CACHE c.id, c.title, co.title as course_title, c.published_date, c.speaker
     FROM classrooms c
     LEFT JOIN courses co ON c.course_id = co.id
     ORDER BY c.published_date DESC 
@@ -40,7 +40,7 @@ export default async function AdminPage() {
 
   // Fetch course categories distribution
   const [categoryStats] = await pool.query(`
-    SELECT category, COUNT(*) as count 
+     SELECT SQL_NO_CACHE category, COUNT(*) as count 
     FROM courses 
     GROUP BY category 
     ORDER BY count DESC
