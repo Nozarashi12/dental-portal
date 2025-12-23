@@ -210,8 +210,8 @@ export default async function AdminPage() {
                     </span>
                     <div className="flex gap-1">
                       <Link 
-                        href={`/client/course/${course.id}`}
-                        className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                      href="/admin/courses"                        
+ className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                         title="View Course"
                       >
                         <Eye className="w-4 h-4" />
@@ -277,15 +277,7 @@ export default async function AdminPage() {
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
                     </span>
-                    <div className="flex gap-1">
-                      <Link 
-                        href={`/admin/users/${user.id}/edit`}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Edit User"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Link>
-                    </div>
+                   
                   </div>
                 </div>
               </div>
@@ -343,7 +335,7 @@ export default async function AdminPage() {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         <Link 
-                          href={`/classrooms/${classroom.id}`}
+                          href="/admin/classrooms" 
                           className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                           title="View Classroom"
                         >
