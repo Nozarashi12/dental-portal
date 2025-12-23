@@ -6,18 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
-    const username = searchParams.get('username')
-    const email = searchParams.get('email')
-
-    if (!userId) {
-      return NextResponse.json(
-        { message: 'userId is required' },
-        { status: 400 }
-      )
-    }
-
+    // Await the params Promise (KEEPING SAME STYLE)
     const { courseId } = await params
 
     if (!courseId) {
@@ -40,7 +29,7 @@ export async function GET(
       )
     }
 
-    // Check existing certificate
+    // Fetch certificate (no user dependency)
     const [certificateRows]: any = await db.query(
       `SELECT 
          c.id,
@@ -52,30 +41,26 @@ export async function GET(
        FROM certificates c
        JOIN users u ON u.id = c.user_id
        JOIN courses co ON co.id = c.course_id
-       WHERE c.user_id = ? AND c.course_id = ?`,
-      [userId, courseId]
+       WHERE c.course_id = ?
+       ORDER BY c.id DESC
+       LIMIT 1`,
+      [courseId]
     )
 
     if (certificateRows.length === 0) {
-      // Create pending certificate
-      await db.query(
-        `INSERT INTO certificates (user_id, course_id, status)
-         VALUES (?, ?, 'pending')`,
-        [userId, courseId]
-      )
-
       return NextResponse.json({
         id: null,
         status: 'pending',
-        username,
-        email,
+        username: null,
+        email: null,
         course_title: courseRows[0].title,
         issued_at: null,
-        message: 'Certificate request created (pending admin approval)'
+        message: 'No certificate created yet'
       })
     }
 
     const certificate = certificateRows[0]
+
     return NextResponse.json({
       ...certificate,
       message:
@@ -98,24 +83,31 @@ export async function POST(
 ) {
   try {
     const { courseId } = await params
-    const body = await req.json()
-    const { action, userId } = body
 
-    if (!userId) {
+    if (!courseId) {
       return NextResponse.json(
-        { message: 'userId is required' },
+        { message: 'Course ID required' },
         { status: 400 }
       )
     }
 
+    const body = await req.json()
+    const { action } = body
+
     if (action === 'download') {
       const [certRows]: any = await db.query(
-        `SELECT c.*, u.name, u.email, co.title
+        `SELECT 
+           c.*,
+           u.name,
+           u.email,
+           co.title
          FROM certificates c
          JOIN users u ON u.id = c.user_id
          JOIN courses co ON co.id = c.course_id
-         WHERE c.user_id = ? AND c.course_id = ? AND c.status = 'approved'`,
-        [userId, courseId]
+         WHERE c.course_id = ? AND c.status = 'approved'
+         ORDER BY c.id DESC
+         LIMIT 1`,
+        [courseId]
       )
 
       if (certRows.length === 0) {
@@ -129,7 +121,10 @@ export async function POST(
         success: true,
         certificate: certRows[0],
         pdfData: {
-          filename: `Certificate_${certRows[0].name}_${certRows[0].title.replace(/\s+/g, '_')}.pdf`
+          filename: `Certificate_${certRows[0].name}_${certRows[0].title.replace(
+            /\s+/g,
+            '_'
+          )}.pdf`
         }
       })
     }
