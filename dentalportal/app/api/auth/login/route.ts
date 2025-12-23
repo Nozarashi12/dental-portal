@@ -1,13 +1,7 @@
 import pool from '@/lib/db'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
-
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined')
-}
-
-const JWT_SECRET = process.env.JWT_SECRET
+import { signToken } from '@/lib/jwt'
 
 export async function POST(req: Request) {
   const { email, password } = await req.json()
@@ -29,11 +23,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    )
+    const token = signToken({
+      id: user.id,
+      role: user.role,
+      email: user.email
+    })
 
     const response = NextResponse.json({
       role: user.role,

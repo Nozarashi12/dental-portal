@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { jwtVerify } from 'jose'
+import { verifyTokenJose } from '@/lib/jwt'
 
 const PUBLIC_ROUTES = ['/', '/client/login', '/client/signup', '/client/faq']
 
@@ -19,8 +19,7 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-    const { payload } = await jwtVerify(token, secret)
+    const payload = await verifyTokenJose(token)
 
     // 🔒 Admin-only routes
     if (pathname.startsWith('/admin') && payload.role !== 'admin') {

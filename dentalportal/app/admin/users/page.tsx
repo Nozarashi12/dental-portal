@@ -7,6 +7,9 @@ import {
   Search, Filter, UserPlus, Download 
 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Fetch users from DB
 async function getUsers() {
   try {
@@ -28,16 +31,23 @@ async function getUsers() {
 // Fetch stats with additional insights
 async function getUserStats() {
   try {
-    const [[{ totalUsers }]] = await pool.query('SELECT COUNT(*) as totalUsers FROM users')
-    const [[{ adminCount }]] = await pool.query('SELECT COUNT(*) as adminCount FROM users WHERE role = "admin"')
-    const [[{ clientCount }]] = await pool.query('SELECT COUNT(*) as clientCount FROM users WHERE role = "client"')
-    const [[{ todayUsers }]] = await pool.query(`
+    const [totalUsersResult] = await pool.query('SELECT COUNT(*) as totalUsers FROM users')
+    const [adminCountResult] = await pool.query('SELECT COUNT(*) as adminCount FROM users WHERE role = "admin"')
+    const [clientCountResult] = await pool.query('SELECT COUNT(*) as clientCount FROM users WHERE role = "client"')
+    const [todayUsersResult] = await pool.query(`
       SELECT COUNT(*) as todayUsers FROM users WHERE DATE(created_at) = CURDATE()
     `)
-    const [[{ weekUsers }]] = await pool.query(`
+    const [weekUsersResult] = await pool.query(`
       SELECT COUNT(*) as weekUsers FROM users 
       WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     `)
+    
+    const totalUsers = (totalUsersResult as any)[0]?.totalUsers || 0
+    const adminCount = (adminCountResult as any)[0]?.adminCount || 0
+    const clientCount = (clientCountResult as any)[0]?.clientCount || 0
+    const todayUsers = (todayUsersResult as any)[0]?.todayUsers || 0
+    const weekUsers = (weekUsersResult as any)[0]?.weekUsers || 0
+    
     return { totalUsers, adminCount, clientCount, todayUsers, weekUsers }
   } catch (error) {
     console.error('Failed to fetch user stats:', error)
@@ -59,19 +69,7 @@ export default async function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-1">Manage user accounts, permissions, and access levels</p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4" />
-            Export
-          </button> */}
-          <Link
-            href="/admin/users/create"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-sm hover:shadow"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add User
-          </Link>
-        </div>
+        
       </div>
 
       {/* Stats Grid */}

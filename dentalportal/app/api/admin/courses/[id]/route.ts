@@ -1,5 +1,8 @@
 import pool from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 type Params = {
   params: Promise<{ id: string }>
 }

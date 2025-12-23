@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { verifyToken } from '@/lib/jwt'
 import pool from '@/lib/db'
 
 export async function GET(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     try {
       // Verify the JWT token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+      const decoded = verifyToken(token)
       
       // Fetch user from database
       const [users] = await pool.query(
@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = verifyToken(token)
     const body = await request.json()
     
     // Update user profile - only allow specific fields to be updated
