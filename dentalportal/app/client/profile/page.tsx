@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Navbar from '../client/Navbar'
-import Footer from '../client/Footer'
+import Navbar from '../Navbar'
+import Footer from '../Footer'
 import Cookies from 'js-cookie'
 import { 
   User, Mail, Phone, MapPin, Calendar, GraduationCap, BookOpen,
@@ -298,7 +298,7 @@ export default function ProfilePage() {
                 <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-600 font-medium">Member Since</p>
+                      <p className="text-sm text-gray-600 font-medium">Mem Since</p>
                       <h3 className="text-2xl font-bold text-gray-900 mt-2">
                         {new Date(userData.created_at).getFullYear()}
                       </h3>
