@@ -128,7 +128,7 @@ export default function Navbar() {
   const loggedInNavItems = [
     { label: 'Course Catalog', href: '/', icon: <BookOpen className="w-4 h-4" /> },
     { label: 'FAQ', href: '/client/faq', icon: <HelpCircle className="w-4 h-4" /> },
-    { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
+    { label: 'Profile', href: '/client/profile', icon: <User className="w-4 h-4" /> },
   ]
 
   const navItems = isLoggedIn ? loggedInNavItems : loggedOutNavItems
