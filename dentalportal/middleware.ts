@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyTokenJose } from '@/lib/jwt'
 
-const PUBLIC_ROUTES = ['/', '/client/login', '/client/signup', '/client/faq']
+const PUBLIC_ROUTES = ['/', '/client/login', '/client/signup', '/client/faq','/client/forgot-password',
+  '/client/reset-password',]
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -25,6 +26,9 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith('/admin') && payload.role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url))
     }
+        if (pathname.startsWith('/api/admin/users') && payload.role !== 'admin') {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
 
     return NextResponse.next()
   } catch {
@@ -34,6 +38,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    '/api/admin/users',
     '/client/:path*',
     '/admin/:path*',
     '/profile/:path*',
