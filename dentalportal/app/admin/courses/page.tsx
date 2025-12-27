@@ -1,4 +1,7 @@
 // app/admin/courses/page.tsx (Server Component)
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import Link from 'next/link';
 import pool from '@/lib/db';
 import CourseList from './CourseList';
@@ -6,6 +9,7 @@ import {
   BookOpen, Plus, DoorOpen, Calendar,
   Users, Clock, FileText, TrendingUp
 } from 'lucide-react';
+
 
 // Fetch all courses with classroom data
 async function getCourses() {

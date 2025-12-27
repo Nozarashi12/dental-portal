@@ -1,4 +1,6 @@
 // app/admin/classrooms/page.tsx (Server Component)
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import Link from 'next/link';
 import pool from '@/lib/db';
 import ClassroomsTable from './ClassroomTable';
@@ -7,6 +9,8 @@ import {
   Video, Clock, FileText, PlayCircle,
   CheckCircle, XCircle
 } from 'lucide-react';
+
+
 
 // Fetch classrooms with course information
 async function getClassrooms() {
