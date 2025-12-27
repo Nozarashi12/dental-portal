@@ -25,10 +25,6 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith('/admin') && payload.role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url))
     }
-    if (pathname === '/api/admin/users' && payload.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
 
     return NextResponse.next()
   } catch {
@@ -42,6 +38,5 @@ export const config = {
     '/admin/:path*',
     '/profile/:path*',
     '/classroom/:path*',
-    
   ],
 }
