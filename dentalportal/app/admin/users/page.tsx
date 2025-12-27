@@ -1,4 +1,5 @@
 // app/admin/users/page.tsx (Server Component)
+
 import Link from 'next/link'
 import UsersTable from './UsersTable'
 import pool from '@/lib/db'
