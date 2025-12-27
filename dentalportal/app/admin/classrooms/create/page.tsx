@@ -19,18 +19,20 @@ export default function CreateClassroomPage() {
   const [success, setSuccess] = useState('')
   
   const [form, setForm] = useState({
-    title: '',
-    speaker: '',
-    course_id: '',
-    video_url: '',
-    description: '',
-    author_description: '',
-    learning_objectives: '',
-    published_date: '',
-    expiration_date: '',
-    discussion_enabled: true,
-    assessment_link: '',
-    google_classroom_link: '',
+     title: '',
+  speaker: '',
+  course_id: '',
+  video_url: '',
+  description: '',
+  author_description: '',
+  learning_objectives: '',
+  published_date: '',
+  expiration_date: '',
+  discussion_enabled: true,
+  assessment_link: '',
+  assessment_link_2: '',
+  assessment_link_3: '',
+  google_classroom_link: '',
   })
 
   useEffect(() => {
@@ -449,6 +451,46 @@ export default function CreateClassroomPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Assessment Link 2 */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="flex items-center gap-2">
+      <Link className="w-4 h-4" />
+      Assessment Link 2 (Optional)
+    </div>
+  </label>
+  <input
+    type="url"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+    placeholder="https://example.com/assessment2"
+    value={form.assessment_link_2}
+    onChange={(e) => handleChange('assessment_link_2', e.target.value)}
+  />
+  <p className="mt-1 text-xs text-gray-500">
+    Additional assessment link
+  </p>
+</div>
+
+{/* Assessment Link 3 */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="flex items-center gap-2">
+      <Link className="w-4 h-4" />
+      Assessment Link 3 (Optional)
+    </div>
+  </label>
+  <input
+    type="url"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+    placeholder="https://example.com/assessment3"
+    value={form.assessment_link_3}
+    onChange={(e) => handleChange('assessment_link_3', e.target.value)}
+  />
+  <p className="mt-1 text-xs text-gray-500">
+    Additional assessment link
+  </p>
+</div>
 
               {/* Form Actions */}
               <div className="flex items-center gap-3 pt-6 border-t border-gray-200">

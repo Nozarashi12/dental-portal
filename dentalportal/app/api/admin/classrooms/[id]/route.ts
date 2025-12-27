@@ -26,7 +26,9 @@ export async function PUT(req: Request, { params }: { params: any }) {
          expiration_date=?,
          discussion_enabled=?,
          google_classroom_link=?,
-         assessment_link=?
+         assessment_link=?,
+         assessment_link_2=?, 
+         assessment_link_3=?  
      WHERE id=?`,
     [
       body.title,
@@ -40,7 +42,9 @@ export async function PUT(req: Request, { params }: { params: any }) {
       formatDateTime(body.expiration_date),
       body.discussion_enabled ? 1 : 0,
       body.discussion_enabled ? body.google_classroom_link : null,
-      body.assessment_link,
+      body.assessment_link || null,
+      body.assessment_link_2 || null, 
+      body.assessment_link_3 || null, 
       id,
     ]
   )

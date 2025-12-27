@@ -23,6 +23,8 @@ interface Classroom {
   expiration_date: string | null
   discussion_enabled: boolean
   assessment_link: string
+  assessment_link_2: string // Add this
+  assessment_link_3: string // Add this
   google_classroom_link: string
 }
 
@@ -54,6 +56,8 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
       : '',
     discussion_enabled: classroom.discussion_enabled ?? true,
     assessment_link: classroom.assessment_link || '',
+     assessment_link_2: classroom.assessment_link_2 || '', 
+  assessment_link_3: classroom.assessment_link_3 || '',
     google_classroom_link: classroom.google_classroom_link || '',
   })
 
@@ -463,7 +467,39 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
                   </div>
                 </div>
               </div>
+              {/* Assessment Link 2 */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="flex items-center gap-2">
+      <Link className="w-4 h-4" />
+      Assessment Link 2 (Optional)
+    </div>
+  </label>
+  <input
+    type="url"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+    placeholder="https://example.com/assessment2"
+    value={form.assessment_link_2}
+    onChange={(e) => handleChange('assessment_link_2', e.target.value)}
+  />
+</div>
 
+{/* Assessment Link 3 */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="flex items-center gap-2">
+      <Link className="w-4 h-4" />
+      Assessment Link 3 (Optional)
+    </div>
+  </label>
+  <input
+    type="url"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+    placeholder="https://example.com/assessment3"
+    value={form.assessment_link_3}
+    onChange={(e) => handleChange('assessment_link_3', e.target.value)}
+  />
+</div>
               {/* Form Actions */}
               <div className="flex items-center gap-3 pt-6 border-t border-gray-200">
                 <button
