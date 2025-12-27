@@ -65,16 +65,43 @@ export default function AssessmentPage() {
       const classroomData = await assessmentRes.json()
 
       // Filter only classrooms with assessment_link and map to Assessment format
-      const assessmentList: Assessment[] = classroomData
-        .filter((c: any) => c.assessment_link)
-        .map((c: any) => ({
-          id: c.id,
-          title: c.title,
-          assessment_link: c.assessment_link,
-          author_description: c.author_description,
-          expiration_date: c.expiration_date,
-          published_date: c.published_date,
-        }))
+     // In the fetchData function
+const assessmentList: Assessment[] = classroomData
+  .filter((c: any) => c.assessment_link || c.assessment_link_2 || c.assessment_link_3)
+  .flatMap((c: any) => {
+    const assessments = [];
+    if (c.assessment_link) {
+      assessments.push({
+        id: c.id,
+        title: `${c.title} - Assessment 1`,
+        assessment_link: c.assessment_link,
+        author_description: c.author_description,
+        expiration_date: c.expiration_date,
+        published_date: c.published_date,
+      });
+    }
+    if (c.assessment_link_2) {
+      assessments.push({
+        id: c.id,
+        title: `${c.title} - Assessment 2`,
+        assessment_link: c.assessment_link_2,
+        author_description: c.author_description,
+        expiration_date: c.expiration_date,
+        published_date: c.published_date,
+      });
+    }
+    if (c.assessment_link_3) {
+      assessments.push({
+        id: c.id,
+        title: `${c.title} - Assessment 3`,
+        assessment_link: c.assessment_link_3,
+        author_description: c.author_description,
+        expiration_date: c.expiration_date,
+        published_date: c.published_date,
+      });
+    }
+    return assessments;
+  });
 
       setAssessments(assessmentList)
     } catch (err: any) {

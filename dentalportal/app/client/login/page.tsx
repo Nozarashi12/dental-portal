@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, AlertCircle, GraduationCap } from 'lucide-react'
+import { Mail, Lock, AlertCircle, GraduationCap, Key } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import Cookies from 'js-cookie' // Add this import
+import Cookies from 'js-cookie'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <input
                   type="email"
-                  className="w-full pl-10 py-3 border rounded-lg"
+                  className="w-full pl-10 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   placeholder="you@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -115,12 +115,21 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Password</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium block">Password</label>
+                <Link 
+                  href="/client/forgot-password" 
+                  className="text-sm text-emerald-700 hover:text-emerald-900 font-medium flex items-center gap-1"
+                >
+                  <Key className="w-3 h-3" />
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <input
                   type="password"
-                  className="w-full pl-10 py-3 border rounded-lg"
+                  className="w-full pl-10 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
                   placeholder="Enter your password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -132,23 +141,32 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-lg text-white font-semibold ${
-                loading ? 'bg-emerald-400' : 'bg-emerald-700 hover:bg-emerald-800'
+              className={`w-full py-3.5 rounded-lg text-white font-semibold transition-colors ${
+                loading 
+                  ? 'bg-emerald-400 cursor-not-allowed' 
+                  : 'bg-emerald-700 hover:bg-emerald-800 shadow-md hover:shadow-lg'
               }`}
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p>
-              Don’t have an account?{' '}
-              <Link href="/client/signup" className="text-emerald-700 font-semibold">
+          <div className="mt-8 text-center space-y-4">
+           
+
+            <p className="text-gray-600">
+              Don't have an account?{' '}
+              <Link 
+                href="/client/signup" 
+                className="text-emerald-700 hover:text-emerald-900 font-semibold"
+              >
                 Create one
               </Link>
             </p>
           </div>
         </div>
+
+        
       </div>
     </div>
   )

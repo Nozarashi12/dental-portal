@@ -471,7 +471,7 @@ export default function LandingPage() {
               {/* Subtitle */}
               <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
                 Advance your dental practice with accredited courses, expert-led training, 
-                and the latest clinical techniques from Yenepoya Dental College
+                and the latest clinical techniques from Rayyan Learning Management System.
               </p>
               
               {/* Main Search Bar */}
@@ -1040,19 +1040,18 @@ export default function LandingPage() {
                 Why Dental Professionals Choose Us
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Trusted by Dentists Nationwide
+                Structured Courses with Assessments & Certifications
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                30+ years of excellence in dental education and clinical training
+               Dedicated Discussion Forums, Assesments, and certificates to validate your learning and skills
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <ValueCard
                 icon={<Shield className="w-8 h-8" />}
-                title="DCI Accredited"
-                description="All courses are accredited by Dental Council of India, ensuring recognized CDE credits for license renewal"
-                accent="emerald"
+                title=" Online Courses"
+                description="All Courses with assessments and Certificates available online, accessible anytime, anywhere"
               />
               <ValueCard
                 icon={<TrendingUp className="w-8 h-8" />}
@@ -1080,7 +1079,7 @@ export default function LandingPage() {
               Ready to Advance Your Dental Career?
             </h2>
             <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-              Join thousands of dental professionals who trust Yenepoya for their continuing education
+              Join thousands of dental professionals who trust Rayyan LMS for their continuing education
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

@@ -28,6 +28,8 @@ interface Classroom {
   discussion_enabled: boolean;
   google_classroom_link?: string; 
   assessment_link?: string;
+   assessment_link_2?: string; // Add this
+  assessment_link_3?: string; // Add this
   created_at: string;
   updated_at: string;
   course_title: string;
@@ -143,8 +145,9 @@ export default function ClassroomPage() {
     const totalSpeakers = [...new Set(classrooms.map(c => c.speaker))].length
     const totalDuration = classrooms.reduce((sum, c) => sum + (c.duration_minutes || 60), 0)
     const lecturesWithVideo = classrooms.filter(c => c.video_url && c.video_url.trim() !== '').length
-    const lecturesWithAssessment = classrooms.filter(c => c.assessment_link && c.assessment_link.trim() !== '').length
-    
+ const lecturesWithAssessment = classrooms.filter(c => 
+    c.assessment_link || c.assessment_link_2 || c.assessment_link_3
+  ).length;    
     return {
       totalLectures,
       totalSpeakers,
@@ -497,11 +500,11 @@ export default function ClassroomPage() {
                                 Video Available
                               </span>
                             )}
-                            {lecture.assessment_link && (
-                              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center">
-                                <FileText className="w-3 h-3 mr-1" />
-                                Assessment
-                              </span>
+                            {(lecture.assessment_link || lecture.assessment_link_2 || lecture.assessment_link_3) && (
+  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center">
+    <FileText className="w-3 h-3 mr-1" />
+    Assessment{(lecture.assessment_link && lecture.assessment_link_2) ? 's' : ''}
+  </span>
                             )}
                           </div>
                           
@@ -560,15 +563,35 @@ export default function ClassroomPage() {
                             </Button>
                           )}
                           
-                          {lecture.assessment_link && (
-                            <button 
-                              className="flex items-center justify-center px-4 py-3 text-purple-600 hover:text-purple-800 font-medium text-sm border-2 border-purple-200 rounded-lg hover:bg-purple-50 transition-colors shadow-sm"
-                              onClick={() => window.open(lecture.assessment_link, '_blank')}
-                            >
-                              <FileText className="w-4 h-4 mr-2" />
-                              Take Assessment
-                            </button>
-                          )}
+                         <div className="flex flex-col gap-2">
+  {lecture.assessment_link && (
+    <button 
+      className="flex items-center justify-center px-4 py-3 text-purple-600 hover:text-purple-800 font-medium text-sm border-2 border-purple-200 rounded-lg hover:bg-purple-50 transition-colors shadow-sm"
+      onClick={() => window.open(lecture.assessment_link, '_blank')}
+    >
+      <FileText className="w-4 h-4 mr-2" />
+      Take Assessment 1
+    </button>
+  )}
+  {lecture.assessment_link_2 && (
+    <button 
+      className="flex items-center justify-center px-4 py-3 text-blue-600 hover:text-blue-800 font-medium text-sm border-2 border-blue-200 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
+      onClick={() => window.open(lecture.assessment_link_2, '_blank')}
+    >
+      <FileText className="w-4 h-4 mr-2" />
+      Take Assessment 2
+    </button>
+  )}
+  {lecture.assessment_link_3 && (
+    <button 
+      className="flex items-center justify-center px-4 py-3 text-indigo-600 hover:text-indigo-800 font-medium text-sm border-2 border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm"
+      onClick={() => window.open(lecture.assessment_link_3, '_blank')}
+    >
+      <FileText className="w-4 h-4 mr-2" />
+      Take Assessment 3
+    </button>
+  )}
+</div>
                           {lecture.discussion_enabled && lecture.google_classroom_link && (
   <button
     onClick={() => window.open(lecture.google_classroom_link!, '_blank')}
