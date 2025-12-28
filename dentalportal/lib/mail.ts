@@ -8,8 +8,6 @@ const SMTP_PASS = process.env.SMTP_PASS || 'Rayyanlms#123'
 const SMTP_FROM = process.env.SMTP_FROM || 'Rayyan LMS <info@rayyanlms.com>'
 const SMTP_SECURE = process.env.SMTP_SECURE === 'true' // converts string to boolean
 
-// Debug logs
-console.log('DEBUG mail.ts:', { SMTP_HOST, SMTP_PORT, SMTP_USER })
 
 // Create transporter
 const transporter = nodemailer.createTransport({
