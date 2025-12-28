@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { verifyResetToken } from '@/lib/token'
-import pool from '@/lib/db'
+import getPool from '@/lib/db'
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +16,8 @@ export async function POST(req: Request) {
 
     // 1️⃣ Verify JWT signature
     const { userId } = verifyResetToken(token)
+
+    const pool = await getPool()
 
     // 2️⃣ Verify token exists in DB and not expired
     const [rows]: any = await pool.query(
