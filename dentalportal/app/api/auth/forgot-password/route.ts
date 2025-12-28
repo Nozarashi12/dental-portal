@@ -1,37 +1,38 @@
 import { NextResponse } from 'next/server'
-import getPool from '@/lib/db'
+import pool from '@/lib/db'
 import { generateResetToken } from '@/lib/token'
 import { sendResetEmail } from '@/lib/mail'
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json()
-    if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    }
 
-    const pool = await getPool()
+    // Query user by email
     const [rows]: any = await pool.query('SELECT id FROM users WHERE email = ?', [email])
 
     if (rows.length === 0) {
+      // Security: don’t reveal if email exists
       return NextResponse.json({ message: 'Reset link sent if account exists' })
     }
 
     const userId = rows[0].id
     const token = generateResetToken(userId)
 
+    // Save reset token & expiry in DB
     await pool.query(
       `UPDATE users SET reset_token = ?, reset_token_expiry = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE id = ?`,
       [token, userId]
     )
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const resetLink = `${appUrl}/client/reset-password?token=${token}`
-
-    // ✅ DEBUG LOG to confirm which URL is used
-    console.log('DEBUG: Reset link URL being used:', resetLink)
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/client/reset-password?token=${token}`
 
     try {
       await sendResetEmail(email, resetLink)
-    } catch (emailError) {
+      console.log('DEBUG: Reset email sent to', email, 'with link:', resetLink)
+    } catch (emailError: any) {
       console.error('Email send error:', emailError)
       return NextResponse.json({ error: 'Failed to send email', details: emailError.message }, { status: 500 })
     }
