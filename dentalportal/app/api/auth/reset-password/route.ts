@@ -1,26 +1,19 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { verifyResetToken } from '@/lib/token'
-import getPool from '@/lib/db'
+import pool from '@/lib/db'
 
 export async function POST(req: Request) {
   try {
     const { token, password } = await req.json()
-    if (!token || !password) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-
-    // 1️⃣ Verify JWT signature
-    let userId: number
-    try {
-      const decoded = verifyResetToken(token)
-      userId = decoded.userId
-    } catch (err: any) {
-      console.error('Invalid reset token:', err)
-      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
+    if (!token || !password) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    const pool = await getPool()
+    // Verify JWT signature
+    const { userId } = verifyResetToken(token)
 
-    // 2️⃣ Verify token exists in DB and not expired
+    // Verify token exists in DB and is not expired
     const [rows]: any = await pool.query(
       `SELECT id FROM users 
        WHERE id = ? 
@@ -33,10 +26,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
     }
 
-    // 3️⃣ Hash new password
+    // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // 4️⃣ Update password & clear token
+    // Update password & clear token
     await pool.query(
       `UPDATE users
        SET password = ?, reset_token = NULL, reset_token_expiry = NULL
@@ -47,6 +40,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Password reset successful' }, { status: 200 })
   } catch (error: any) {
     console.error('Reset password error:', error)
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: error.message || 'Invalid or expired token' }, { status: 400 })
   }
 }
