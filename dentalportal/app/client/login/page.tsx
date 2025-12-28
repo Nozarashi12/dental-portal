@@ -121,7 +121,6 @@ export default function LoginPage() {
                   href="/client/forgot-password" 
                   className="text-sm text-emerald-700 hover:text-emerald-900 font-medium flex items-center gap-1"
                 >
-                  <Key className="w-3 h-3" />
                   Forgot Password?
                 </Link>
               </div>
@@ -155,7 +154,7 @@ export default function LoginPage() {
            
 
             <p className="text-gray-600">
-              Don't have an account?{' '}
+              Don't have an Account?{' '}
               <Link 
                 href="/client/signup" 
                 className="text-emerald-700 hover:text-emerald-900 font-semibold"
