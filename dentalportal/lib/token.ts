@@ -39,13 +39,7 @@ function sanitizeExpiresIn(
 const JWT_EXPIRES_IN = sanitizeExpiresIn(process.env.JWT_EXPIRES_IN, '1d')
 const RESET_TOKEN_EXPIRES_IN = sanitizeExpiresIn(process.env.RESET_TOKEN_EXPIRES_IN, '1h')
 
-// ==============================
-// Debug (safe)
-// ==============================
-console.log('DEBUG token.ts', {
-  JWT_EXPIRES_IN,
-  RESET_TOKEN_EXPIRES_IN,
-})
+
 
 // ==============================
 // JWT helpers
