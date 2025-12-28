@@ -23,7 +23,11 @@ export async function POST(req: Request) {
       [token, userId]
     )
 
-    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/client/reset-password?token=${token}`
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const resetLink = `${appUrl}/client/reset-password?token=${token}`
+
+    // ✅ DEBUG LOG to confirm which URL is used
+    console.log('DEBUG: Reset link URL being used:', resetLink)
 
     try {
       await sendResetEmail(email, resetLink)
