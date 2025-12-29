@@ -82,7 +82,6 @@ export default function ClassroomPage() {
     try {
       setError(null)
       
-      // Fetch course data
       const courseRes = await fetch(`/api/admin/courses/${courseId}`)
       if (!courseRes.ok) {
         if (courseRes.status === 404) {
