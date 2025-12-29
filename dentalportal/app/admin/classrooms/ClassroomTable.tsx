@@ -29,6 +29,8 @@ interface Classroom {
   assessment_link: string | null
   created_date?: string
   updated_date?: string
+  ce_credit: number
+
 }
 
 interface ClassroomsTableProps {
@@ -122,6 +124,7 @@ export default function ClassroomsTable({ classrooms = [] }: ClassroomsTableProp
             <th className="pb-4 px-6 font-medium">Course</th>
             <th className="pb-4 px-6 font-medium">Speaker</th>
             <th className="pb-4 px-6 font-medium">Schedule</th>
+            <th className="pb-4 px-6 font-medium">CE Credit</th>
             <th className="pb-4 px-6 font-medium">Features</th>
             <th className="pb-4 px-6 font-medium text-right">Actions</th>
           </tr>
@@ -194,7 +197,16 @@ export default function ClassroomsTable({ classrooms = [] }: ClassroomsTableProp
                     )}
                   </div>
                 </td>
-                
+                <td className="py-4 px-6">
+  <div className="flex items-center gap-2">
+    <BookOpen className="w-4 h-4 text-gray-400" />
+    <span className="font-medium text-gray-900">
+      {classroom.ce_credit}
+    </span>
+    <span className="text-xs text-gray-500">Credits</span>
+  </div>
+</td>
+
                 <td className="py-4 px-6">
                   <div className="flex flex-wrap gap-2">
                     {classroom.discussion_enabled && (

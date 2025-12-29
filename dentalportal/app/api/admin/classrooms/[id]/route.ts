@@ -6,7 +6,6 @@ export async function PUT(req: Request, { params }: { params: any }) {
 
   const body = await req.json()
 
-  // Convert datetime-local strings to MySQL DATETIME format
   const formatDateTime = (dt: string | null) => {
     if (!dt) return null
     const d = new Date(dt)
@@ -28,7 +27,8 @@ export async function PUT(req: Request, { params }: { params: any }) {
          google_classroom_link=?,
          assessment_link=?,
          assessment_link_2=?, 
-         assessment_link_3=?  
+         assessment_link_3=?,
+         ce_credit=?              -- ✅ ADDED
      WHERE id=?`,
     [
       body.title,
@@ -43,8 +43,9 @@ export async function PUT(req: Request, { params }: { params: any }) {
       body.discussion_enabled ? 1 : 0,
       body.discussion_enabled ? body.google_classroom_link : null,
       body.assessment_link || null,
-      body.assessment_link_2 || null, 
-      body.assessment_link_3 || null, 
+      body.assessment_link_2 || null,
+      body.assessment_link_3 || null,
+      body.ce_credit ?? 0,       
       id,
     ]
   )

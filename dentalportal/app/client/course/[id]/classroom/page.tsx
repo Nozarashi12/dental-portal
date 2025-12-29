@@ -30,6 +30,7 @@ interface Classroom {
   assessment_link?: string;
    assessment_link_2?: string; // Add this
   assessment_link_3?: string; // Add this
+  ce_credit?: number;
   created_at: string;
   updated_at: string;
   course_title: string;
@@ -141,23 +142,37 @@ export default function ClassroomPage() {
 
   // Calculate statistics from actual data
   const stats = useMemo(() => {
-    const totalLectures = classrooms.length
-    const totalSpeakers = [...new Set(classrooms.map(c => c.speaker))].length
-    const totalDuration = classrooms.reduce((sum, c) => sum + (c.duration_minutes || 60), 0)
-    const lecturesWithVideo = classrooms.filter(c => c.video_url && c.video_url.trim() !== '').length
- const lecturesWithAssessment = classrooms.filter(c => 
-    c.assessment_link || c.assessment_link_2 || c.assessment_link_3
-  ).length;    
-    return {
-      totalLectures,
-      totalSpeakers,
-      totalCE: Math.round(totalLectures * 1.5),
-      totalDuration,
-      lecturesWithVideo,
-      lecturesWithAssessment,
-      totalViews: classrooms.reduce((sum, c) => sum + (c.views || 0), 0)
-    }
-  }, [classrooms])
+  const totalLectures = classrooms.length
+  const totalSpeakers = [...new Set(classrooms.map(c => c.speaker))].length
+  const totalDuration = classrooms.reduce(
+    (sum, c) => sum + (c.duration_minutes || 60),
+    0
+  )
+
+  const totalCE = classrooms.reduce(
+    (sum, c) => sum + (c.ce_credit || 0),
+    0
+  )
+
+  const lecturesWithVideo = classrooms.filter(
+    c => c.video_url && c.video_url.trim() !== ''
+  ).length
+
+  const lecturesWithAssessment = classrooms.filter(
+    c => c.assessment_link || c.assessment_link_2 || c.assessment_link_3
+  ).length
+
+  return {
+    totalLectures,
+    totalSpeakers,
+    totalCE,
+    totalDuration,
+    lecturesWithVideo,
+    lecturesWithAssessment,
+    totalViews: classrooms.reduce((sum, c) => sum + (c.views || 0), 0)
+  }
+}, [classrooms])
+
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -491,9 +506,12 @@ export default function ClassroomPage() {
                             <span className="px-3 py-1 bg-gradient-to-r from-emerald-100 to-emerald-50 text-emerald-800 rounded-full text-sm font-semibold">
                               #{index + 1}
                             </span>
-                            <span className="px-3 py-1 bg-emerald-600 text-white rounded-full text-sm font-medium">
-                              1.5 CE Credits
-                            </span>
+                           {lecture.ce_credit !== undefined && (
+  <span className="px-3 py-1 bg-emerald-600 text-white rounded-full text-sm font-medium">
+    {lecture.ce_credit} CE Credit{lecture.ce_credit !== 1 ? 's' : ''}
+  </span>
+)}
+
                             {lecture.video_url && (
                               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium flex items-center">
                                 <PlayCircle className="w-3 h-3 mr-1" />
