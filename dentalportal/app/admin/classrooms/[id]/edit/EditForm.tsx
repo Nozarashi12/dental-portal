@@ -26,6 +26,7 @@ interface Classroom {
   assessment_link_2: string // Add this
   assessment_link_3: string // Add this
   google_classroom_link: string
+  ce_credit: number
 }
 
 interface EditClassroomFormProps {
@@ -59,6 +60,7 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
      assessment_link_2: classroom.assessment_link_2 || '', 
   assessment_link_3: classroom.assessment_link_3 || '',
     google_classroom_link: classroom.google_classroom_link || '',
+     ce_credit: classroom.ce_credit?.toString() || '',
   })
 
   useEffect(() => {
@@ -90,6 +92,8 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
     if (!form.description.trim()) newErrors.description = 'Description is required'
     if (!form.learning_objectives.trim()) newErrors.learning_objectives = 'Learning objectives are required'
     if (!form.published_date) newErrors.published_date = 'Published date is required'
+    if (!form.ce_credit) newErrors.ce_credit = 'CE Credit is required'
+
     
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -366,6 +370,34 @@ export default function EditClassroomForm({ classroom }: EditClassroomFormProps)
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  {/* CE Credit */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="flex items-center gap-2">
+      <Target className="w-4 h-4" />
+      CE Credit *
+    </div>
+  </label>
+  <input
+    type="number"
+    step="0.5"
+    min="0"
+    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition ${
+      errors.ce_credit ? 'border-red-300' : 'border-gray-300'
+    }`}
+    placeholder="e.g. 2.0"
+    value={form.ce_credit}
+    onChange={(e) => handleChange('ce_credit', e.target.value)}
+  />
+  {errors.ce_credit && (
+    <p className="mt-1 text-sm text-red-600">{errors.ce_credit}</p>
+  )}
+  <p className="mt-1 text-xs text-gray-500">
+    Enter CE credit hours for this classroom
+  </p>
+</div>
+
                   {/* Published Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

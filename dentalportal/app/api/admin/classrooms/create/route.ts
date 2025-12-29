@@ -16,9 +16,10 @@ export async function POST(req: Request) {
       expiration_date,
       discussion_enabled,
       assessment_link,
-      assessment_link_2, // ✅ ADDED
-      assessment_link_3, // ✅ ADDED
+      assessment_link_2,
+      assessment_link_3,
       google_classroom_link,
+      ce_credit,                  // ✅ ADDED
     } = body
 
     await pool.query(
@@ -35,9 +36,10 @@ export async function POST(req: Request) {
         discussion_enabled,
         google_classroom_link,
         assessment_link,
-        assessment_link_2, // ✅ ADDED
-        assessment_link_3  // ✅ ADDED
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        assessment_link_2,
+        assessment_link_3,
+        ce_credit                  -- ✅ ADDED
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         course_id,
         title,
@@ -51,8 +53,9 @@ export async function POST(req: Request) {
         discussion_enabled ?? 1,
         discussion_enabled ? google_classroom_link : null,
         assessment_link || null,
-        assessment_link_2 || null, // ✅ ADDED
-        assessment_link_3 || null, // ✅ ADDED
+        assessment_link_2 || null,
+        assessment_link_3 || null,
+        ce_credit ?? 0,             // ✅ ADDED
       ]
     )
 
