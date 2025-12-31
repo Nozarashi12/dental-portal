@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, LogOut, User, BookOpen, HelpCircle } from 'lucide-react'
+import { Menu,Scan, X, LogOut, User, BookOpen, HelpCircle } from 'lucide-react'
 import Cookies from 'js-cookie'
 
 export default function Navbar() {
@@ -129,6 +129,7 @@ export default function Navbar() {
     { label: 'Course Catalog', href: '/', icon: <BookOpen className="w-4 h-4" /> },
     { label: 'FAQ', href: '/client/faq', icon: <HelpCircle className="w-4 h-4" /> },
     { label: 'Profile', href: '/client/profile', icon: <User className="w-4 h-4" /> },
+    { label: "Radiology", href: "/radiology", icon: <Scan className="w-4 h-4" />},
   ]
 
   const navItems = isLoggedIn ? loggedInNavItems : loggedOutNavItems
